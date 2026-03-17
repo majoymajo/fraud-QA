@@ -47,9 +47,10 @@ El MVP incluirá:
 1. Identificacion de riesgos 
 2. Definir la probabilidad e impacto
 3. Priorizacion de riesgos
-4. Determinacion de los tiempos de recuperacion
-5. Plan de accion ante riesgos
-6. Monitoreo
+4. Evaluación de Impacto
+5. Determinacion de los tiempos de recuperacion
+
+
 
 ### 1. Identificacion de Riesgos 
 
@@ -109,6 +110,18 @@ Afecta la experiencia de usuario y la adopción del producto. Incluso puede prov
 - Contratiempos operativos 
 
  Generan re-planificacion de horarios y tareas lo que podria afectar la productividad y bienestear del equipo
+
+- Fallos técnicos  
+
+Pueden interrumpir servicios críticos, afectar disponibilidad y perjudicar la reputación de la empresa.
+
+## 5. Determinación de tiempos de recuperación
+
+Tiempo máximo para restablecer operaciones despúes de un incidente : 
+
+**Operaciones críticas** : 2-4 horas 
+
+**Desempeño técnico**: 24 - 32 horas. 
 
 
 
