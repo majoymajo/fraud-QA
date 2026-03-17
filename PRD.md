@@ -52,7 +52,7 @@ El MVP incluirá:
 
 
 
-### 1. Identificacion de Riesgos 
+## 1. Identificacion de Riesgos 
 
 Negocio: Retrasos en entregas, sobrecostos , cambios operativos , poca acogida del MVP. 
 
@@ -64,17 +64,7 @@ Técnicos:  Falta de claridad en requerimientos, bajo desempeño , contratiempos
 
 **Impacto**: 1(mínimo) a 5 (crítico) 
 
-## 3. Priorización de riesgos 
-
-Multiplicacion de probabilidad por impacto: 
-
->= 12   Riesgo Alto 
-
-6-11     Riesgo medio 
-
-<= 5     Riesgo bajo 
-
-## 4. Evaluación de Impacto
+## 3. Evaluación de Impacto 
 
 ### Riesgos de Negocio 
 
@@ -114,6 +104,16 @@ Afecta la experiencia de usuario y la adopción del producto. Incluso puede prov
 - Fallos técnicos  
 
 Pueden interrumpir servicios críticos, afectar disponibilidad y perjudicar la reputación de la empresa.
+
+
+## 4. Priorización de riesgos
+
+Multiplicacion de probabilidad por impacto:
+    
+    >= 12   Riesgo Alto   
+    6-11     Riesgo medio
+    <= 5     Riesgo bajo
+
 
 ## 5. Determinación de tiempos de recuperación
 
