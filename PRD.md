@@ -43,16 +43,12 @@ El MVP incluirá:
 
 ## Riesgos de Negocio y Técnicos
 
-### Brainstorming: 
+    Identificacion de riesgos 
 
-    - Contratiempos operativos 
+    Analisis cualitativo 
 
-    - Bajo desempeño 
+    Analisis cuantitativo 
 
-    - Costes elevados 
+    Plan de accion ante Riesgos  
 
-    - Factor tiempo 
-
-    - Cambios operativos 
-
-    - Falta de claridad 
+    Monitoreo 
