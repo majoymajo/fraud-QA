@@ -15,3 +15,22 @@ Desarrollar un sistema antifraude que permita detectar transacciones sospechosas
 
     3. Mejorar la seguridad contra fraudes financieros a través de advertencias tempranas y clasificaciones de casos sospechosos en 3 categorias de riesgo (alto,medio,bajo). 
 
+## Alcance del MVP
+
+El producto en su primera versión se enfocará en la detección básica de transacciones sospechosas mediante reglas simples y claras.
+
+El MVP incluirá:
+
+    1. Evaluación de transacciones en tiempo real basada en dos criterios:
+	
+    -Monto superior a un umbral fijo (ej. 15,000).
+    -Ubicación considerada inusual o fuera del país del usuario.
+	
+    2. Clasificación de la transacción como:
+
+    -Sospechosa
+    -No sospechosa
+    
+    3.	Generación de una alerta cuando una transacción sea marcada como sospechosa.    
+    
+    4. Registro de las transacciones evaluadas y su resultado.
