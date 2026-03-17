@@ -9,10 +9,9 @@ Desarrollar un sistema antifraude que permita detectar transacciones sospechosas
 
 ## Objetivos
 
-    1. Evaluar transacciones en tiempo real para detectar comportamientos anómalos como monto inusual o ubicación atípica sin afectar la experiencia de usuario. 
+    1. Evaluar transacciones en tiempo real y marcar como sospechosas aquellas con un monto mayor a 15000$ o que provengan de paraísos fiscales fuera del país de residencia del usuario. 
 
-    2. Diseñar una plataforma tecnológica escalable capaz de recibir nuevas reglas de antifraude . 
+    2. Diseñar un sistema antifraude escalable capaz de recibir nuevas reglas y funciones que incrementen la confiabilidad de las transacciones de los usuarios. 
 
-    3. Mejorar la seguridad contra fraudes financieros a través de advertencias tempranas y clasificaciones de casos sospechosos para revisión posterior. 
+    3. Mejorar la seguridad contra fraudes financieros a través de advertencias tempranas y clasificaciones de casos sospechosos en 3 categorias de riesgo (alto,medio,bajo). 
 
-    
