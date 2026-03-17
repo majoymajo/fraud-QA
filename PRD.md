@@ -46,8 +46,8 @@ El MVP incluirá:
 
 1. Identificacion de riesgos 
 2. Definir la probabilidad e impacto
-3. Priorizacion de riesgos
-4. Evaluación de Impacto
+3. Evaluacion de impacto
+4. Priorizacion de riesgos
 5. Determinacion de los tiempos de recuperacion
 
 
