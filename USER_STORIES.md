@@ -56,3 +56,11 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Quiero** marcar ciertas transacciones como “requiere revisión manual”
 
 **Para** que puedan ser analizadas por un operador humano cuando no sean concluyentes
+
+## HU8 – Configurar monto máximo
+
+**Como** administrador
+
+**Quiero** definir el monto límite de transacciones
+
+**Para** establecer el umbral de detección
