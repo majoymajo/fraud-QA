@@ -64,3 +64,11 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Quiero** definir el monto límite de transacciones
 
 **Para** establecer el umbral de detección
+
+## HU9 – Configurar ubicaciones habituales
+
+**Como** administrador
+
+**Quiero** definir las ubicaciones habituales de un usuario basadas en su historial de transacciones
+
+**Para** mejorar la detección de anomalías
