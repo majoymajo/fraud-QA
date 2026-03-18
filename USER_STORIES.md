@@ -32,3 +32,11 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Quiero**: Asignar una categoría de riesgo (Alto, Medio, Bajo) a cada transacción sospechosa según los criterios establecidos
 
 **Para**: priorizar su análisis.
+
+## HU5 – Generar alerta de fraude
+
+**Como** sistema antifraude
+
+**Quiero** generar una alerta cuando identifique una transacción sospechosa
+
+**Para** que la operación sea validada automáticamente o reciba revisión humana.
