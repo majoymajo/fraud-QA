@@ -40,3 +40,11 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Quiero** generar una alerta cuando identifique una transacción sospechosa
 
 **Para** que la operación sea validada automáticamente o reciba revisión humana.
+
+## HU6 Registrar transacciones evaluadas
+
+**Como** sistema antifraude
+
+**Quiero** guardar el resultado de cada transacción analizada
+
+**Para** tener un historial que permita auditar las decisiones tomadas
