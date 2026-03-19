@@ -16,10 +16,26 @@
 
 ## DEV Tasks
 
-    •	Definir el modelo con los datos de ubicación (país, ciudad, IP)
+    •	Definir la entidad con los datos de ubicación (país, ciudad, IP)
+
+    • 	Crear tabla de historial de ubicaciones
 
     •	Comparar la ubicación actual con el historial de ubicaciones del usuario
 
     •	Crear la lógica para detectar si una ubicación es inusual
 
     •	Devolver si la ubicación es inusual o no
+
+# HU3 – Marcar transacción sospechosa
+
+## DEV Tasks
+
+    • 	recibir los resultados de la evaluación de monto y ubicación.
+
+    • 	Definir reglas configurables (ej. monto > umbral o ubicación no habitual).
+
+    • 	Determinar si la transacción es sospechosa o no.
+
+    • 	Integrar con el flujo de evaluación general.
+    
+    • 	Retornar resultado si la transacción es sospechosa o no.
