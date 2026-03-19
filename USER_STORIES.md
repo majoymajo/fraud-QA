@@ -12,11 +12,17 @@
 
 **Escenario 1: Monto exced el umbral**
 
-        Dado que el monto de una transaccion excede el umbral establecido 
+        Dado que el monto de una transacción excede el umbral establecido 
 
-        Cuando ingresa la transaccion al sistema  
+        Cuando la transacción es procesada por el sistema   
 
         Entonces el sistema lo clasifica como transacción inusual 
+**Escenario 2 : Monto es igual o menor al umbral**
+        Dado que el monto de la transacción es menor  o igua a X  
+
+        Cuando la transacción es procesada por el sistema 
+
+        Entonces el sistema no lo clasifica como movimiento sospechoso
 ## HU2 – Evaluar ubicación de la transacción
 
 **Como** sistema antifraude
