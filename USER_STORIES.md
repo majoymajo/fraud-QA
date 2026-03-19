@@ -94,6 +94,16 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para** que la operación sea validada automáticamente o reciba revisión humana.
 
+### Criterios de aceptación
+**Escenario 1 : Emitir alerta de fraude**
+        Dado que una transacción es detectada como sospechosa 
+
+        Y se le asigna una categoría de riesgo 
+
+        Cuando se termina este proceso 
+
+        Entonces el sistema emite una alerta para ser validada automaticamente o por un humano 
+        
 ## HU6 Registrar transacciones evaluadas
 
 **Como** sistema antifraude
