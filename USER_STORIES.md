@@ -78,6 +78,14 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para**: priorizar su análisis.
 
+### Criterios de aceptación
+**Escenario 1: Categorizar el nivel de riesgo de una transacción**
+        Dado que una transacción es detectada como sospechosa 
+
+        Cuando el sistema evalua los criterios estalecidos 
+
+        Entonces el sistema asigna una cateogria (baja,media o alta) de riesgo 
+
 ## HU5 – Generar alerta de fraude
 
 **Como** sistema antifraude
