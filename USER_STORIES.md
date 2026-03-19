@@ -46,10 +46,6 @@
 
         Entonces el sistema lo detecta como transacción usual. 
 
-
-
-
-
 ## HU3 – Marcar transacción sospechosa
 
 **Como** sistema antifraude
@@ -58,6 +54,15 @@
 sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubicación inusual)
 
 **Para** permitir su revisión
+
+### Criterios de aceptación
+
+**Escenario 1: Señal de transacción sospechosa**
+        Dado que el sistema evalua el monto y lugar de cada transacción  
+
+        Cuando la transacción no cumple alguno de estos criterios 
+
+        Entonces el sistema señala como sospechosa la transacción. 
 
 ## HU4 Clasificar nivel de riesgo
 
