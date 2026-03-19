@@ -135,11 +135,11 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Para** que puedan ser analizadas por un operador humano cuando no sean concluyentes
 
 ### Criterios de aceptación
-**Escenario 1: Transacción que requiere revision manual** 
+**Escenario 1: Transacción que requiere revisión manual** 
 
-        Dado que una transaccion es evaluada por el sistema  
+        Dado que una transacción es evaluada por el sistema  
 
-        Cuando no puede ser evaluada automaticamente  
+        Cuando no puede ser evaluada automáticamente  
 
         Entonces el sistema envía la transacción para revisión manual 
 
@@ -150,6 +150,17 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Quiero** definir el monto límite de transacciones
 
 **Para** establecer el umbral de detección
+
+### Criterios de aceptación
+**Escenario 1: Determinación del monto límite**
+
+        Dado que el administrador tiene acceso al sistema  
+
+        Cuando el ingrese el monto limite de una transacción  
+
+        Entonces el sistema guardara ese parametro  
+
+        Y lo aplicara  al evaluar las transacciones 
 
 ## HU9 – Configurar ubicaciones habituales
 
