@@ -187,3 +187,14 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Quiero** definir los criterios de clasificación de riesgo
 
 **Para** ajustar la priorización de transacciones
+
+### Criterios de aceptación
+**Escenario 1 : Determinar criterios para clasificación de riesgo** 
+
+        Dado que el administrador tiene acceso al sistema 
+
+        Cuando ingrese puede colocar los criterios para categorizar transacciones como  (baja,media o alto) riesgo 
+
+        Entonces el sistema guarda estos criterios  
+
+        Y los aplica al evaluar las transacciones. 
