@@ -200,26 +200,29 @@ Tiempo máximo para restablecer operaciones despúes de un incidente :
 
 - **Poca acogida del MVP**
 
-    Programas/Charlas de incentivación del programa. 
+        Programas/Charlas de incentivación del programa. 
 
-    Demostraciones live del MVP.
+        Demostraciones live del MVP.
 
 ### **Riesgos Técnicos**
 
 - **Falta de claridad en los requerimientos**
 
-    Reuniones para unificar ideas y alinear objetivos . 
+        Reuniones para unificar ideas y alinear objetivos . 
 
-    Esto garantizaría que todos esten en sincronía nuevamente. 
+        Esto garantizaría que todos esten en sincronía nuevamente. 
 
-    Documentación de los acuerdos de las reuniones en un lugar accesible para el equipo.
+        Documentación de los acuerdos de las reuniones 
+        en un lugar accesible para el equipo.
 
 - **Bajo desempeño y fallos técnicos**
 
-    Mantener activo el sistema para clientes con las funcionalidades que esten funcionando exitosamente y reparación en background de las partes que necesitan mejoras. 
+         Mantener activo el sistema para clientes con las funcionalidades que esten funcionando exitosamente 
+         y reparación en background de las partes que 
+         necesitan mejoras. 
 
 - **Contratiempos operativos**
 
-    Replanificación de tareas y horarios. 
+        Replanificación de tareas y horarios. 
 
-    Comunicar a los clientes con anticipación o dar updates regulares.  
+        Comunicar a los clientes con anticipación o dar updates regulares.  
