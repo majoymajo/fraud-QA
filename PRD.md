@@ -81,12 +81,12 @@ El MVP incluirá:
 ### Metodología: 
 Cualitativa y Business Impact Analysis (BIA)
 
-1. Identificacion de riesgos 
-2. Definir la probabilidad e impacto
-3. Evaluacion de impacto
-4. Priorizacion de riesgos
-5. Determinacion de los tiempos de recuperacion
-6. PLan de acción ante riesgos
+1. [Identificación de riesgos](#1-identificacion-de-riesgos)
+2. [Definir la probabilidad e impacto](#2-definir-la-probabilidad-e-impacto)
+3. [Evaluación de impacto](#3-evaluacion-de-impacto)
+4. [Priorización de riesgos](#4-priorizacion-de-riesgos)
+5. [Determinación de los tiempos de recuperación](#5-determinacion-de-los-tiempos-de-recuperacion)
+6. [Plan de acción ante riesgos](#6-plan-de-accion-ante-riesgos)
 
 
 
