@@ -37,5 +37,27 @@
     • 	Determinar si la transacción es sospechosa o no.
 
     • 	Integrar con el flujo de evaluación general.
-    
+
     • 	Retornar resultado si la transacción es sospechosa o no.
+
+# HU4 – Clasificar nivel de riesgo
+
+## DEV Tasks
+
+    •   Definir niveles de riesgo (Alto, Medio, Bajo)
+
+    • 	Implementar servicio que combine monto y ubicación para asignar riesgo
+
+    •	Aplicar reglas configurables.
+
+    • 	Asignar nivel de riesgo 
+
+    • 	Retornar resultado con categoría de riesgo.
+
+**Lógica de clasificación**
+
+    •	Si el monto es alto y la ubicación es inusual → riesgo alto
+
+    •	Si solo una de las dos condiciones se cumple → riesgo medio
+    
+    •	Si ninguna se cumple → riesgo bajo
