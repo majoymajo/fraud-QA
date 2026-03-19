@@ -82,7 +82,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Escenario 1: Categorizar el nivel de riesgo de una transacción**
         Dado que una transacción es detectada como sospechosa 
 
-        Cuando el sistema evalua los criterios estalecidos 
+        Cuando el sistema evalua los criterios establecidos por el administrador
 
         Entonces el sistema asigna una cateogria (baja,media o alta) de riesgo 
 
@@ -103,7 +103,13 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
         Cuando se termina este proceso 
 
         Entonces el sistema emite una alerta para ser validada automaticamente o por un humano 
-        
+**Escenario 2: No emitir alerta de fraude**
+        Dado que una transacción no es detectada como sospechosa 
+
+        Cuando se termina el proceso de evaluación 
+
+        Entonces el sistema no emite ninguna alerta
+
 ## HU6 Registrar transacciones evaluadas
 
 **Como** sistema antifraude
