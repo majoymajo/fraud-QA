@@ -8,6 +8,15 @@
 
 **Para**  identificar valores inusualmente altos 
 
+### Criterios de aceptación 
+
+**Escenario 1: Monto exced el umbral**
+
+        Dado que el monto de una transaccion excede el umbral establecido 
+
+        Cuando ingresa la transaccion al sistema  
+
+        Entonces el sistema lo clasifica como transacción inusual 
 ## HU2 – Evaluar ubicación de la transacción
 
 **Como** sistema antifraude
