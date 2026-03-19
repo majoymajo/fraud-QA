@@ -125,7 +125,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
         Cuando se determina su estado final (Sospechosa o no sospechosa) 
 
         Entonces el sistema registra en la base de datos los resultados de esta evaluación
-        
+
 ## HU7 – Marcar transacciones para revisión manual
 
 **Como** sistema antifraude
@@ -133,6 +133,15 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 **Quiero** marcar ciertas transacciones como “requiere revisión manual”
 
 **Para** que puedan ser analizadas por un operador humano cuando no sean concluyentes
+
+### Criterios de aceptación
+**Escenario 1: Transacción que requiere revision manual** 
+
+        Dado que una transaccion es evaluada por el sistema  
+
+        Cuando no puede ser evaluada automaticamente  
+
+        Entonces el sistema envía la transacción para revisión manual 
 
 ## HU8 – Configurar monto máximo
 
