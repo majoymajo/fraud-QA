@@ -78,12 +78,15 @@ El MVP incluirá:
 
 ## Riesgos de Negocio y Técnicos
 
+### Metodología: 
+Cualitativa y Business Impact Analysis (BIA)
 
 1. Identificacion de riesgos 
 2. Definir la probabilidad e impacto
 3. Evaluacion de impacto
 4. Priorizacion de riesgos
 5. Determinacion de los tiempos de recuperacion
+6. PLan de acción ante riesgos
 
 
 
@@ -149,6 +152,10 @@ Multiplicacion de probabilidad por impacto:
     6-11     Riesgo medio
     <= 5     Riesgo bajo
 
+| Riesgo                  | Probabilidad | Impacto | Prioridad |
+|--------------------------|--------------|---------|-----------|
+| Retrasos en la entrega   | 3            | 3       | 9         |
+| Sobrecostos              | 2            | 4       | 8         |
 
 ## 5. Determinación de tiempos de recuperación
 
@@ -158,5 +165,12 @@ Tiempo máximo para restablecer operaciones despúes de un incidente :
 
 **Desempeño técnico**: 24 - 32 horas. 
 
+## 6 Plan de acción ante riesgos
 
+### Riesgos de Negocio
 
+- **Retrasos en la entrega**
+
+    Comunicar a los clientes con anticipación o dar updates regulares 
+
+    Generar un update del plan con nuevos horarios y distribucion de tareas. 
