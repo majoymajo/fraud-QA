@@ -31,6 +31,18 @@
 
 **Para** identificar si es sospechosa. 
 
+### Criterios de aceptación 
+
+**Escenario 1:Ubicación de la transacción inusual**
+        Dado que la ubicación usual de la transferencia esta registrada   
+
+        Cuando se hace un movimiento desde una ubicación inusual  
+
+        Entonces el sistema lo detecta como transacción inusual.    
+
+
+
+
 ## HU3 – Marcar transacción sospechosa
 
 **Como** sistema antifraude
