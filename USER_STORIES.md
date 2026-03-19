@@ -8,7 +8,7 @@
 
 **Para**  identificar valores inusualmente altos 
 
-### Criterios de aceptación 
+### **Criterios de aceptación** 
 
 **Escenario 1: Monto exced el umbral**
 
@@ -31,7 +31,7 @@
 
 **Para** identificar si es sospechosa. 
 
-### Criterios de aceptación 
+### **Criterios de aceptación** 
 
 **Escenario 1:Ubicación de la transacción inusual**
         Dado que la ubicación habitual del usuario esta registrada   
@@ -55,7 +55,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para** permitir su revisión
 
-### Criterios de aceptación
+### **Criterios de aceptación**
 
 **Escenario 1: Señal de transacción sospechosa**
         Dado que el sistema evalua el monto y lugar de cada transacción  
@@ -78,7 +78,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para**: priorizar su análisis.
 
-### Criterios de aceptación
+### **Criterios de aceptación**
 **Escenario 1: Categorizar el nivel de riesgo de una transacción**
         Dado que una transacción es detectada como sospechosa 
 
@@ -94,7 +94,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para** que la operación sea validada automáticamente o reciba revisión humana.
 
-### Criterios de aceptación
+### **Criterios de aceptación**
 **Escenario 1 : Emitir alerta de fraude**
         Dado que una transacción es detectada como sospechosa 
 
@@ -118,7 +118,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para** tener un historial que permita auditar las decisiones tomadas
 
-### Criterios de aceptación
+### **Criterios de aceptación**
 **Escenario 1: Registro de transacción**
         Dado que las transacciones han sido evaluadas  
 
@@ -134,7 +134,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para** que puedan ser analizadas por un operador humano cuando no sean concluyentes
 
-### Criterios de aceptación
+### **Criterios de aceptación**
 **Escenario 1: Transacción que requiere revisión manual** 
 
         Dado que una transacción es evaluada por el sistema  
@@ -151,7 +151,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para** establecer el umbral de detección
 
-### Criterios de aceptación
+### **Criterios de aceptación**
 **Escenario 1: Determinación del monto límite**
 
         Dado que el administrador tiene acceso al sistema  
@@ -188,7 +188,7 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
 
 **Para** ajustar la priorización de transacciones
 
-### Criterios de aceptación
+### **Criterios de aceptación**
 **Escenario 1 : Determinar criterios para clasificación de riesgo** 
 
         Dado que el administrador tiene acceso al sistema 
