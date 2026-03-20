@@ -2,29 +2,29 @@
 
 ## DEV Tasks
 
-    • 	Diseñar la entidad con los datos que va a tener una transacción (id, monto, fecha)
+    • 	Diseñar la entidad con los datos que va a tener una transacción (id, monto, fecha).
 
-    • 	Crear la tabla en la base de datos
+    • 	Crear la tabla en la base de datos.
 
-    • 	Comparar el monto contra el umbral configurado
+    • 	Comparar el monto contra el umbral .configurado.
 
-    •	Determinar si el monto es normal o inusual
+    •	Determinar si el monto es normal o inusual.
 
-    • 	Manejar errores como montos negativos o valores no numéricos 
+    • 	Manejar errores como montos negativos o valores no numéricos.
 
 # HU2 – Evaluar ubicación de la transacción
 
 ## DEV Tasks
 
-    •	Definir la entidad con los datos de ubicación (país, ciudad, IP)
+    •	Definir la entidad con los datos de ubicación (país, ciudad, IP).
 
-    • 	Crear tabla de historial de ubicaciones
+    • 	Crear tabla de historial de ubicaciones.
 
-    •	Comparar la ubicación actual con el historial de ubicaciones del usuario
+    •	Comparar la ubicación actual con el historial de ubicaciones del usuario.
 
-    •	Crear la lógica para detectar si una ubicación es inusual
+    •	Crear la lógica para detectar si una ubicación es inusual.
 
-    •	Devolver si la ubicación es inusual o no
+    •	Devolver si la ubicación es inusual o no.
 
 # HU3 – Marcar transacción sospechosa
 
@@ -44,23 +44,23 @@
 
 ## DEV Tasks
 
-    •   Definir niveles de riesgo (Alto, Medio, Bajo)
+    •   Definir niveles de riesgo (Alto, Medio, Bajo).
 
-    • 	Implementar servicio que combine monto y ubicación para asignar riesgo
+    • 	Implementar servicio que combine monto y ubicación para asignar riesgo.
 
     •	Aplicar reglas configurables.
 
-    • 	Asignar nivel de riesgo 
+    • 	Asignar nivel de riesgo.
 
     • 	Retornar resultado con categoría de riesgo.
 
 **Lógica de clasificación**
 
-    •	Si el monto es alto y la ubicación es inusual → riesgo alto
+    •	Si el monto es alto y la ubicación es inusual → riesgo alto.
 
-    •	Si solo una de las dos condiciones se cumple → riesgo medio
+    •	Si solo una de las dos condiciones se cumple → riesgo medio.
 
-    •	Si ninguna se cumple → riesgo bajo
+    •	Si ninguna se cumple → riesgo bajo.
 
 
 # HU5 – Generar alerta de fraude
@@ -73,6 +73,16 @@
 
     • 	Validar duplicidad de alertas por transacción.
 
-    • 	Enviar alerta como evento 
+    • 	Enviar alerta como evento.
+
+# HU6 – Registrar transacciones evaluadas
+
+## DEV Tasks
+
+    • 	Guardar el resultado de evaluación.
+    
+    • 	Guardar nivel de riesgo asociado.
+
+    • 	Crear endpoint  con filtros y paginación.
 
    
