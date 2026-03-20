@@ -12,6 +12,12 @@
 
     • 	Manejar errores como montos negativos o valores no numéricos.
 
+## QA Tasks
+    -  Probar valores límite mayores, menores e iguales al umbral.
+
+    -  Probar montos negativos ,texto en lugar de números o montos nulos/vacíos.
+
+
 # HU2 – Evaluar ubicación de la transacción
 
 ## DEV Tasks
