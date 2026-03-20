@@ -113,3 +113,23 @@
 
     • 	Integrar el umbral con evaluación de monto.
 
+
+
+#  HU9 – Configurar ubicaciones habituales
+
+## DEV Tasks
+
+    • 	Diseñar la entidad.
+
+    • 	Crear la tabla de ubicaciones por usuario.
+
+    • 	Crear el endpoint.
+
+    • 	Validar los datos de ubicación.
+
+    • 	Actualizar el historial del usuario.
+
+    • 	Integrar con la evaluación de ubicación.
+
+
+
