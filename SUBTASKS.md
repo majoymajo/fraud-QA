@@ -131,5 +131,17 @@
 
     • 	Integrar con la evaluación de ubicación.
 
+# HU10 – Configurar niveles de riesgo
+
+## DEV Tasks
+
+• 	Definir entidad/configuración de reglas de riesgo.
+
+• 	Crear endpoint.
+
+• 	Validar reglas ingresadas.
+
+• 	Integrar reglas con clasificación de riesgo.
+
 
 
