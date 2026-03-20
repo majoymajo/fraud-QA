@@ -6,31 +6,38 @@
 
     • 	Crear la tabla en la base de datos.
 
-    • 	Comparar el monto contra el umbral .configurado.
+    • 	Comparar el monto contra el umbral configurado.
 
     •	Determinar si el monto es normal o inusual.
 
     • 	Manejar errores como montos negativos o valores no numéricos.
 
-## QA Tasks
-    -  Probar valores límite mayores, menores e iguales al umbral.
+## QA Tasks  🧪
 
-    -  Probar montos negativos ,texto en lugar de números o montos nulos/vacíos.
+- **Probar valores límite** : mayores, menores e iguales al umbral.
+
+- **Probar fromatos distintos** : montos negativos ,texto en lugar de números o montos nulos/vacíos.
 
 
 # HU2 – Evaluar ubicación de la transacción
 
 ## DEV Tasks
 
-    •	Definir la entidad con los datos de ubicación (país, ciudad, IP).
+    •	Definir la entidad con los datos de ubicación (país, IP).
 
     • 	Crear tabla de historial de ubicaciones.
 
-    •	Comparar la ubicación actual con el historial de ubicaciones del usuario.
+    •	Comparar el páis actual con el país registrado del usuario.
 
     •	Crear la lógica para detectar si una ubicación es inusual.
 
     •	Devolver si la ubicación es inusual o no.
+
+## QA Tasks  🧪
+
+- **Probar ubicaciones usuales** : país  donde el usuario ha tenido actividad previa.
+
+- **Probar ubicaciones inusuales** : país  donde el usuario no ha tenido actividad previa.
 
 # HU3 – Marcar transacción sospechosa
 
