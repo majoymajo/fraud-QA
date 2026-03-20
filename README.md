@@ -35,3 +35,7 @@ Consideraciones:
 | HU4  | Clasificar el riesgo               | 5           | Combina múltiples condiciones (monto y/ o ubicación) e introduce reglas de negocio adicionales. |
 | HU5  | Generar alerta                  | 5           | Incluye lógica de duplicidad y emisión de eventos. Depende de otras HUs. |
 | HU6  | Registrar transacciones         | 5           | Implementación de persistencia, endpoint, filtros y paginación.  |
+| HU7  | Revisión manual                 | 5           | Manejo de estados y reglas de negocio adicionales. Persistencia y consultas. |
+| HU8  | Configurar monto                | 3           | CRUD simple con validaciones básicas e integración con HU1. Baja complejidad. |
+| HU9  | Ubicaciones habituales          | 8           | Manejo de historial por usuario e integración directa con HU2. Alta complejidad y crecimiento potencial. |
+| HU10 | Configurar niveles de riesgo    | 5           | Configuración dinámica de reglas. Requiere validación e integración con clasificación. |
