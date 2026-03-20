@@ -103,7 +103,7 @@
 
 ## QA Tasks  🧪
 
-- **Confirmar que las transacciones sospechosas emiten alerta esperada**
+- **Confirmar que las transacciones sospechosas emiten una alerta**: la alerta deber ser para cada nivel de riesgo(bajo,medio,alto).
 
 # HU6 – Registrar transacciones evaluadas
 
@@ -115,7 +115,9 @@
 
     • 	Crear endpoint  con filtros y paginación.
 
-   
+## QA Tasks  🧪
+
+- **Confirmar registro exitoso de transacciones evaluadas** : verificar que las transacciones se guardan en la base de datos con su clasificacion de riesgo y correcto tipo de transacción(Sospechosa/No Sospechosa).  
 
 # HU7 – Marcar transacciones para revisión manual
 
