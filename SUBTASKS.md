@@ -25,7 +25,7 @@
 
     •	Definir la entidad con los datos de ubicación (país, IP).
 
-    • 	Crear tabla de historial de ubicaciones.
+    • 	Crear tabla del país de ubicación.
 
     •	Comparar el páis actual con el país registrado del usuario.
 
@@ -53,6 +53,12 @@
 
     • 	Retornar resultado si la transacción es sospechosa o no.
 
+## QA Tasks  🧪
+
+- **Verificar la detección de  transacciones sospechosas** : transacciones con montos/ubicaciones inusuales.
+
+- **Verficar la detección de transacciones no sospechosas** : transacciones con montos/ubicaciones usuales.
+
 # HU4 – Clasificar nivel de riesgo
 
 ## DEV Tasks
@@ -75,6 +81,9 @@
 
     •	Si ninguna se cumple → riesgo bajo.
 
+## QA Tasks  🧪
+
+- **Comprobar que su nivel de riesgo(bajo,medio,alto )** haya sido asignado cumpliendo los criterios establecidos por el admin.
 
 # HU5 – Generar alerta de fraude
 
