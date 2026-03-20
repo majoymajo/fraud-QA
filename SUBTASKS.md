@@ -59,5 +59,20 @@
     •	Si el monto es alto y la ubicación es inusual → riesgo alto
 
     •	Si solo una de las dos condiciones se cumple → riesgo medio
-    
+
     •	Si ninguna se cumple → riesgo bajo
+
+
+# HU5 – Generar alerta de fraude
+
+## DEV Tasks
+
+    • 	Definir la entidad con los campos (id, transactionId, riesgo, fecha).
+
+    • 	Implementar la lógica para generar una alerta para transacciones sospechosas.
+
+    • 	Validar duplicidad de alertas por transacción.
+
+    • 	Enviar alerta como evento 
+
+   
