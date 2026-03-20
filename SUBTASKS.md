@@ -117,7 +117,7 @@
 
 ## QA Tasks  🧪
 
-- **Confirmar registro exitoso de transacciones evaluadas** : verificar que las transacciones se guardan en la base de datos con su clasificacion de riesgo y correcto tipo de transacción(Sospechosa/No Sospechosa).  
+- **Confirmar registro exitoso de transacciones evaluadas** : verificar que las transacciones se guardan en la base de datos con su clasificacion de riesgo y tipo de transacción(Sospechosa/No Sospechosa).  
 
 # HU7 – Marcar transacciones para revisión manual
 
