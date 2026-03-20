@@ -208,11 +208,3 @@ sospechosas cuando cumplan cumplan los siguientes criterios(ej. monto alto o ubi
         Entonces el sistema guarda estos criterios  
 
         Y los aplica al evaluar las transacciones. 
-
-
-
-| HU   | Descripción                      | Story Points | Justificación |
-|------|----------------------------------|-------------|--------------|
-| HU1  | Evaluar monto                   | 3           | Lógica simple de validación y comparación contra umbral. Baja complejidad. |
-| HU2  | Evaluar ubicación               | 5           | Requiere comparar con historial del usuario y definir qué es “inusual”. Mayor complejidad. |
-| HU3  | Marcar sospechosa               | 3           |  No agrega lógica compleja nueva, solo orquesta logica de otras HUs |
