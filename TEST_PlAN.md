@@ -1,4 +1,13 @@
-# 📗 Plan de Pruebas: Micro-Sprints Antifraude (HU1 & HU2)
+# 📗 Plan de Pruebas
+**Proyecto:** 💳FinTech: Motor de Reglas de Fraude
+
+**Sistema bajo pruebas:** HU1 y HU2
+
+**Fecha:** 24/03/2026
+
+**Version:** 1.0
+
+**Equipo:** Silvania Ramos y Maria Jose Castro 
 
 ## 1. Contexto
 El sistema a probar es un **Motor de Detección de Fraude** en su etapa inicial. El problema de negocio que resuelve es la necesidad de filtrar transacciones sospechosas mediante el análisis de valores inusualmente altos y ubicaciones geográficas no habituales, protegiendo así los activos de los usuarios ante movimientos anómalos.
