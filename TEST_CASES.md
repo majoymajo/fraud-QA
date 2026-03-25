@@ -384,7 +384,7 @@
 | :--- | :--- |
 | **ID** | TC-024 |
 | **Historia de Usuario** | HU4 – Clasificar nivel de riesgo |
-| **Escenario Gherkin** | **Dado** que una transacción tiene monto alto (20,000) **PERO** ubicación habitual ("Colombia") **Cuando** el sistema evalúa el riesgo **Entonces** asigna el nivel de riesgo "MEDIO" |
+| **Escenario Gherkin** | **Dado** que una transacción tiene monto alto (20,000) **Y** ubicación habitual ("Colombia") **Cuando** el sistema evalúa el riesgo **Entonces** asigna el nivel de riesgo "MEDIO" |
 | **Precondiciones** | Solo una regla de riesgo activada (Monto). |
 | **Datos de entrada** | `monto: 20000`, `pais: "Colombia"` |
 | **Pasos de ejecución** | 1. Ejecutar evaluación con un solo factor (monto). 2. Validar el campo `nivel_riesgo`. |
