@@ -351,8 +351,8 @@
 | **Escenario Gherkin** | **Dado** que el monto es normal (2,000) **Y** la ubicación es usual ("Colombia") **Cuando** la transacción es procesada **Entonces** el sistema marca la transacción como "No Sospechosa" |
 | **Precondiciones** | Umbral: 15,000. Registro habitual: Colombia. |
 | **Datos de entrada** | `monto: 2000`, `pais: "Colombia"` |
-| **Pasos de ejecución** | 1. Enviar transacción legítima (monto bajo, país habitual). 2. Verificar campo `sospechosa`. |
-| **Resultado esperado** | `sospechosa: false`. |
+| **Pasos de ejecución** | 1. Enviar transacción legítima (monto bajo, país habitual). 2. Verificar campo `no sospechosa`. |
+| **Resultado esperado** | `no sospechosa: true`. |
 | **Resultado obtenido** | Sin ejecutar |
 | **Estado** | 🔘 Sin ejecutar |
 | **Prioridad** | 🔴 Crítico |
