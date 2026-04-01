@@ -1,0 +1,33 @@
+{
+  "request_payloads": {
+    "tc_001_monto_alto": {
+      "transaccion_id": "TXN-1001",
+      "monto": 20000,
+      "fecha": "2026-03-24",
+      "usuario_id": "USR-001"
+    },
+    "tc_002_monto_bajo": {
+      "transaccion_id": "TXN-1002",
+      "monto": 5000,
+      "fecha": "2026-03-24",
+      "usuario_id": "USR-002"
+    },
+    "tc_005_monto_negativo": {
+      "transaccion_id": "TXN-1005",
+      "monto": -500,
+      "fecha": "2026-03-24",
+      "usuario_id": "USR-005"
+    },
+    "tc_010_ubicacion_diferente": {
+      "usuario_id": "USR-010",
+      "pais_habitual": "Colombia",
+      "pais_transaccion": "Islas Caimán",
+      "ip": "192.168.10.50"
+    },
+    "tc_023_double_risk": {
+      "monto": 25000,
+      "pais": "Corea del Norte",
+      "usuario_id": "USR-023"
+    }
+  }
+}

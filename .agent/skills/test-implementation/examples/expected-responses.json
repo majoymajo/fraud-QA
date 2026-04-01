@@ -1,0 +1,54 @@
+{
+  "response_examples": {
+    "success_monto_evaluacion": {
+      "status_code": 200,
+      "body": {
+        "transaccion_id": "TXN-1001",
+        "clasificacion": "Inusual",
+        "razon": "Monto 20000 excede umbral 15000"
+      }
+    },
+    "success_ubicacion_evaluacion": {
+      "status_code": 200,
+      "body": {
+        "usuario_id": "USR-010",
+        "clasificacion": "Inusual",
+        "razon": "Ubicación 'Islas Caimán' difiere de habitual 'Colombia'"
+      }
+    },
+    "success_nivel_riesgo_alto": {
+      "status_code": 200,
+      "body": {
+        "transaccion_id": "TXN-023",
+        "nivel_riesgo": "ALTO",
+        "sospechosa": true,
+        "factores": ["monto_inusual", "ubicacion_inusual"]
+      }
+    },
+    "error_monto_negativo": {
+      "status_code": 400,
+      "body": {
+        "codigo": 400,
+        "mensaje": "El monto debe ser un número positivo",
+        "campo": "monto",
+        "valor": -500
+      }
+    },
+    "error_monto_null": {
+      "status_code": 400,
+      "body": {
+        "codigo": 400,
+        "mensaje": "El campo 'monto' es obligatorio",
+        "campo": "monto"
+      }
+    },
+    "error_pais_vacio": {
+      "status_code": 400,
+      "body": {
+        "codigo": 400,
+        "mensaje": "El campo 'país' no puede estar vacío",
+        "campo": "pais_transaccion"
+      }
+    }
+  }
+}
