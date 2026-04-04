@@ -18,7 +18,7 @@ import org.junit.platform.suite.api.Suite;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = "cucumber.glue", value = "co.sofka.fraud.steps")
-@ConfigurationParameter(key = "cucumber.plugin", value = "pretty, io.cucumber.core.plugin.SerenityReporterParallelPlugin")
+@ConfigurationParameter(key = "cucumber.plugin", value = "pretty, io.cucumber.core.plugin.SerenityReporterParallel")
 public class FraudTestSuite {
     // Runner class — no body required for JUnit Platform Suite
 }
