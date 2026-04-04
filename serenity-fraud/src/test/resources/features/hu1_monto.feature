@@ -1,4 +1,3 @@
-# language: es
 @HU1
 Feature: HU1 – Evaluar monto de la transacción
   Como sistema antifraude

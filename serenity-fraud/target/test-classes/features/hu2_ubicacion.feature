@@ -1,4 +1,3 @@
-# language: es
 @HU2
 Feature: HU2 – Evaluar ubicación de la transacción
   Como sistema antifraude

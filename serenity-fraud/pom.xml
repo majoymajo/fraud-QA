@@ -94,15 +94,35 @@
                 </configuration>
             </plugin>
 
+            <!-- Skip default Surefire so it does not try to run JUnit5 classes -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+
+            <!-- Failsafe runs at integration-test phase; Serenity JSON is ready for aggregate -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
                     <includes>
                         <include>**/FraudTestSuite.java</include>
                     </includes>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

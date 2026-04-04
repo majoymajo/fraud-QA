@@ -1,4 +1,3 @@
-# language: es
 @HU3
 Feature: HU3 – Marcar transacción sospechosa
   Como sistema antifraude
