@@ -1,4 +1,4 @@
-package co.sofka.fraud;
+package test.java.co.sofka.fraud;
 
 import com.intuit.karate.junit5.Karate;
 
