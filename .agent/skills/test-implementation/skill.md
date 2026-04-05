@@ -29,9 +29,9 @@ description: |
 
 | Document | Location |
 |---|---|
-| Test Plan | `../../TEST_PlAN.md` |
-| Test Cases | `../../TEST_CASES.md` |
-| User Stories | `../../USER_STORIES.md` |
+| Test Plan | `	../../../Docs/TEST_PlAN.md` |
+| Test Cases | `	../../../Docs/TEST_CASES.md` |
+| User Stories | `	../../../Docs/USER_STORIES.md` |
 
 ---
 
@@ -110,7 +110,7 @@ After implementing tests:
 - [ ] Runner configured (Serenity/Karate)
 - [ ] Config files in place (serenity.conf, karate-config.js)
 - [ ] Tests executed and passing
-- [ ] Update [TEST_CASES.md](../../TEST_CASES.md) with results:
+- [ ] Update [TEST_CASES.md](../../../Docs/TEST_CASES.md) with results:
   - Change `**Estado**` from `🔘 Sin ejecutar` → `✅ Pasó` or `❌ Falló`
   - Fill `**Resultado obtenido**` with actual response
   - Update **Estado General de Ejecución** table
