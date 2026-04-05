@@ -8,16 +8,10 @@
 
 ---
 
-## 📋 Visión del Producto
+## 📋 Descripción 
 
-Desarrollar un sistema antifraude que permita detectar transacciones sospechosas de acuerdo al monto y ubicación. Al ubicar montos superiores a un umbral o ubicaciones inusuales, se conseguirá aumentar la seguridad de las transacciones y reducir el riesgo de fraudes, garantizando una mejor experiencia del usuario.
-
-### 🎯 Objetivos Principales
-- ✅ Detección en tiempo real de transacciones fraudulentas
-- ✅ Evaluación por monto y geolocalización
-- ✅ Clasificación de niveles de riesgo
-- ✅ Alertas automáticas configurables
-- ✅ Historial y trazabilidad completa
+Repositorio dedicado a la validación automatizada de las HU1-HU4 del sistema antifraude 
+mediante Serenity BDD, Cucumber, Karate y k6, cubriendo pruebas funcionales, de API y de performance.
 
 ## 📁 Estructura del Proyecto
 
