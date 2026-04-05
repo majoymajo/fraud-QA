@@ -191,9 +191,6 @@ k6 run -o json=results.json k6-fraud/fraud_load_test.js
 
 ## 📈 Arquitectura & Flujo
 
-
-## 📈 Arquitectura & Flujo
-
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Frontend (React + Vite)                     │
@@ -265,12 +262,6 @@ Se utilizó la escala **Fibonacci (3, 5, 8)** para estimar complejidad:
 | `Serenity-+-Cucumber` | Pruebas funcionales BDD | En desarrollo |
 | **`Karate`** | **Pruebas API (Actual)** | **✅ Activa** |
 
-**Cambiar a rama Karate:**
-```bash
-git checkout Karate
-git pull origin Karate
-```
-
 ---
 
 ## 📊 Estado de Pruebas
@@ -283,18 +274,48 @@ git pull origin Karate
 | HU4 | hu4_risk_levels.feature | 4 | ✅ Pasado | 0.38s |
 | **Total** | **3 Features** | **11 Casos** | **✅ 0 Fallos** | **3.44s** |
 
-### Serenity BDD Tests (Step 4 - Próximo)
+### Serenity BDD Tests (Step 4 - Completado)
 - TC-001 a TC-004: HU1 (Validaciones)
 - TC-008 a TC-012: HU2 y HU3 (Ubicación y Evaluación)
 - TC-016 a TC-022: HU4 (Riesgo y Alertas)
 
-**Estado:** 🔘 Sin ejecutar
+**Ejecutar pruebas Serenity:**
+```bash
+mvn clean verify -f serenity-fraud/pom.xml
+```
+
+**Abre el reporte Serenity:**
+```powershell
+ii .\serenity-fraud\target\site\serenity\index.html
+```
+
+**Resultados Actuales:**
+| Métrica | Valor |
+|---------|-------|
+| Casos de Prueba | 15 |
+| Pasados | ✅ 14 |
+| Fallos | ❌ 1 |
+| Errores | 0 |
+| Pendientes | 0 |
+| Ignorados | 0 |
+| **Tasa de Éxito** | **93.3%** |
 
 ### k6 Performance Tests (Step 5 - Próximo)
 - TC-PERF: Carga combinada HU1 + HU3
 - Métricas: p95 < 500ms, error rate < 5%
 
 **Estado:** 🔘 Sin ejecutar
+
+---
+
+## 📊 Resumen General de Ejecución
+
+| Etapa | Pruebas | Casos | Pasados | Fallos | Estado | Cobertura |
+|-------|---------|-------|---------|--------|--------|-----------|
+| **Step 3** | Karate API | 11 | ✅ 11 | 0 | ✅ Completado | HU1, HU2, HU4 |
+| **Step 4** | Serenity BDD | 15 | ✅ 14 | ❌ 1 | ✅ Completado (93.3%) | HU1-HU4 |
+| **Step 5** | k6 Performance | 1 | - | - | 🔘 Pendiente | HU1+HU3 |
+| **TOTAL** | **27 TCs** | **27** | **✅ 25** | **❌ 1** | **96.3% Éxito** | **HU1-HU4** |
 
 ---
 
