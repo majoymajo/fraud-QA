@@ -172,6 +172,14 @@ mvn clean verify -f serenity-fraud/pom.xml -Dserenity.report.dir=target/site/ser
 ii .\serenity-fraud\target\site\serenity\index.html
 ```
 
+**Resultados Actuales:**
+- ✅ **15 casos ejecutados**
+- ✅ **14 pasados**
+- ❌ **1 fallo**
+- ✅ **0 errores**
+- ✅ **0 pendientes**
+- ✅ **0 ignorados**
+
 ---
 
 ### **Pruebas de Performance (k6)** - TC-PERF
