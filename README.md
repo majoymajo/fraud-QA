@@ -321,36 +321,6 @@ ii .\serenity-fraud\target\site\serenity\index.html
 
 ---
 
-## 🤝 Contribuir
-
-### Workflow de Desarrollo
-
-1. **Crear rama desde `Karate`:**
-   ```bash
-   git checkout -b feature/nueva-prueba Karate
-   ```
-
-2. **Implementar pruebas siguiendo:**
-   - [TEST_CASES.md](Docs/TEST_CASES.md) para specs
-   - [TEST_PLAN.md](Docs/TEST_PLAN.md) para framework asignado
-   - [Karate Setup Guide](.agent/skills/test-implementation/references/karate-setup.md)
-
-3. **Ejecutar pruebas localmente:**
-   ```bash
-   mvn clean test -f karate-fraud/pom.xml
-   ```
-
-4. **Commit y Push:**
-   ```bash
-   git add .
-   git commit -m "✨ feat: agregar pruebas para TC-XXX"
-   git push origin feature/nueva-prueba
-   ```
-
-5. **Crear Pull Request** → `Karate`
-
----
-
 ## 📚 Recursos & Enlaces
 
 - **[Documentación del Proyecto](Docs/)**
@@ -369,19 +339,6 @@ Found a bug? [Open an issue](https://github.com/majoymajo/fraud-QA/issues) con:
 - Pasos para reproducir
 - Comportamiento esperado vs actual
 - Logs/screenshots si aplica
-
----
-
-## ✅ Checklist de Release
-
-- [ ] Todas las pruebas Karate pasan
-- [ ] Todas las pruebas Serenity pasan
-- [ ] Pruebas de performance ✅ 
-- [ ] Documentación actualizada
-- [ ] CHANGELOG.md completado
-- [ ] PR review aprobado
-- [ ] Merge a `main`
-- [ ] Tag de release creado
 
 ---
 
