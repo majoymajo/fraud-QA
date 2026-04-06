@@ -317,7 +317,7 @@ Se utilizó la escala **Fibonacci (3, 5, 8)** para estimar complejidad:
 
 ## 📊 Estado de Pruebas
 
-### Karate API Tests (Step 3 - Completado)
+### Karate API Tests 
 | Suite | Feature | Escenarios | Estado | Tiempo |
 |-------|---------|-----------|--------|--------|
 | HU1 | hu1_negative.feature | 3 | ✅ Pasado | 1.73s |
@@ -325,20 +325,10 @@ Se utilizó la escala **Fibonacci (3, 5, 8)** para estimar complejidad:
 | HU4 | hu4_risk_levels.feature | 4 | ✅ Pasado | 0.38s |
 | **Total** | **3 Features** | **11 Casos** | **✅ 0 Fallos** | **3.44s** |
 
-### Serenity BDD Tests (Step 4 - Completado)
+### Serenity BDD Tests 
 - TC-001 a TC-004: HU1 (Validaciones)
 - TC-008 a TC-012: HU2 y HU3 (Ubicación y Evaluación)
 - TC-016 a TC-022: HU4 (Riesgo y Alertas)
-
-**Ejecutar pruebas Serenity:**
-```bash
-mvn clean verify -f serenity-fraud/pom.xml
-```
-
-**Abre el reporte Serenity:**
-```powershell
-ii .\serenity-fraud\target\site\serenity\index.html
-```
 
 **Resultados Actuales:**
 | Métrica | Valor |
@@ -351,7 +341,7 @@ ii .\serenity-fraud\target\site\serenity\index.html
 | Ignorados | 0 |
 | **Tasa de Éxito** | **93.3%** |
 
-### k6 Performance Tests (Step 5 - Ejecutado)
+### k6 Performance Tests 
 - TC-PERF: Carga combinada HU1 + HU3
 - Métricas: p95 < 500ms, error rate < 5%
 
