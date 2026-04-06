@@ -110,6 +110,7 @@ Fraud_Detection/
 - Docker y Docker Compose
 - Node.js 18+ (para frontend)
 - PostgreSQL 16 (o usar Docker)
+- k6 con extensión [xk6-dashboard](https://github.com/grafana/xk6-dashboard) (para dashboard interactivo de performance)
 
 ### Instalación Local
 
