@@ -24,53 +24,56 @@ export const options = {
 const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080/api/v1';
 
 export default function () {
-  group('HU1 – Evaluación de monto', () => {
+  group('HU1 – Evaluación de monto (Amount Threshold)', () => {
+    // High amount to trigger fraud detection
     const payload = JSON.stringify({
-      transaccion_id: `TXN-PERF-${__VU}-${__ITER}`,
-      monto: 20000,
-      fecha: '2026-03-24',
-      usuario_id: 'USR-PERF',
+      amount: 20000,
+      transactionCountry: 'CO',
+      userCountry: 'CO',
     });
     const params = { headers: { 'Content-Type': 'application/json' } };
-    const res = http.post(`${BASE_URL}/transacciones/evaluar-monto`, payload, params);
+    const res = http.post(`${BASE_URL}/fraud/evaluate`, payload, params);
 
     evaluateTrend.add(res.timings.duration);
+    const body = JSON.parse(res.body);
     check(res, {
       'status 200': (r) => r.status === 200,
-      'clasificacion Inusual': (r) => JSON.parse(r.body).clasificacion === 'Inusual',
+      'risk detected': (r) => body.riskLevel !== undefined,
     });
   });
 
-  group('HU3 – Marcado de sospecha', () => {
+  group('HU3 – Marcado de sospecha (Suspicious Flag)', () => {
+    // Transaction with unusual location to trigger suspicion
     const payload = JSON.stringify({
-      monto: 20000,
-      pais: 'Islas Caimán',
-      usuario_id: 'USR-PERF',
+      amount: 20000,
+      transactionCountry: 'KY',  // Cayman Islands
+      userCountry: 'CO',         // Colombia
     });
     const params = { headers: { 'Content-Type': 'application/json' } };
-    const res = http.post(`${BASE_URL}/transacciones/marcar-sospecha`, payload, params);
+    const res = http.post(`${BASE_URL}/fraud/evaluate`, payload, params);
 
     const body = JSON.parse(res.body);
-    suspectRate.add(body.sospechosa === true);
+    suspectRate.add(body.suspicious === true ? 1 : 0);
     check(res, {
       'status 200': (r) => r.status === 200,
-      'marcado como Sospechosa': (r) => body.sospechosa === true,
+      'suspicious detected': (r) => body.suspicious === true,
     });
   });
 
-  group('HU2 – Evaluación de ubicación', () => {
+  group('HU2 – Evaluación de ubicación (Location Check)', () => {
+    // Different countries to trigger location anomaly
     const payload = JSON.stringify({
-      usuario_id: 'USR-PERF',
-      pais_habitual: 'Colombia',
-      pais_transaccion: 'Rusia',
+      amount: 5000,
+      transactionCountry: 'RU',  // Russia
+      userCountry: 'CO',         // Colombia
     });
     const params = { headers: { 'Content-Type': 'application/json' } };
-    const res = http.post(`${BASE_URL}/transacciones/evaluar-ubicacion`, payload, params);
+    const res = http.post(`${BASE_URL}/fraud/evaluate`, payload, params);
 
     locationEvalCount.add(1);
     check(res, {
       'status 200': (r) => r.status === 200,
-      'clasificacion Inusual': (r) => JSON.parse(r.body).clasificacion === 'Inusual',
+      'risk evaluated': (r) => JSON.parse(r.body).riskLevel !== undefined,
     });
   });
 
