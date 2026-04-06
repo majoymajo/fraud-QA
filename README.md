@@ -189,6 +189,23 @@ k6 run -u 100 -d 1m k6-fraud/fraud_load_test.js
 k6 run -o json=results.json k6-fraud/fraud_load_test.js
 ```
 
+### Resultados de la última ejecución (2026-04-06)
+
+| Métrica | Objetivo | Resultado | Estado |
+|---------|----------|-----------|--------|
+| p95 response time | < 500ms | 25.69s | ❌ No cumple |
+| Error rate | < 5% | 2.88% | ✅ Cumple |
+| Throughput | Informativo | 5.6 req/s | ✅ Estable |
+| Requests totales | Informativo | 729 | ✅ Ejecutado |
+| Success rate | Informativo | 97.12% | ✅ Alto |
+
+**Conclusión técnica:** El servicio responde correctamente en la mayoría de solicitudes, pero presenta degradación severa de latencia bajo carga de 50 VUs. Se identificaron timeouts durante la fase de carga sostenida.
+
+**Recomendaciones inmediatas:**
+- Ajustar el pool de conexiones (`spring.datasource.hikari.maximum-pool-size`).
+- Revisar queries lentas en PostgreSQL y tiempos de espera del backend.
+- Repetir prueba k6 tras optimización para validar cumplimiento de p95.
+
 ---
 
 ## 📈 Arquitectura & Flujo
@@ -302,11 +319,11 @@ ii .\serenity-fraud\target\site\serenity\index.html
 | Ignorados | 0 |
 | **Tasa de Éxito** | **93.3%** |
 
-### k6 Performance Tests (Step 5 - Próximo)
+### k6 Performance Tests (Step 5 - Ejecutado)
 - TC-PERF: Carga combinada HU1 + HU3
 - Métricas: p95 < 500ms, error rate < 5%
 
-**Estado:** 🔘 Sin ejecutar
+**Estado:** ⚠️ Ejecutado con hallazgos (no cumple p95)
 
 ---
 
@@ -316,8 +333,8 @@ ii .\serenity-fraud\target\site\serenity\index.html
 |-------|---------|-------|---------|--------|--------|-----------|
 | **Step 3** | Karate API | 11 | ✅ 11 | 0 | ✅ Completado | HU1, HU2, HU4 |
 | **Step 4** | Serenity BDD | 15 | ✅ 14 | ❌ 1 | ✅ Completado (93.3%) | HU1-HU4 |
-| **Step 5** | k6 Performance | 1 | - | - | 🔘 Pendiente | HU1+HU3 |
-| **TOTAL** | **27 TCs** | **27** | **✅ 25** | **❌ 1** | **96.3% Éxito** | **HU1-HU4** |
+| **Step 5** | k6 Performance | 1 | ✅ 0 | ❌ 1 | ⚠️ Ejecutado (falla umbral p95) | HU1+HU3 |
+| **TOTAL** | **27 TCs** | **27** | **✅ 25** | **❌ 2** | **92.6% Éxito** | **HU1-HU4** |
 
 ---
 

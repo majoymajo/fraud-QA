@@ -425,6 +425,53 @@
 
 ---
 
+## 🚀 Performance Tests (k6)
+
+> **Objetivo:** Validar que el sistema antifraude puede procesar transacciones bajo carga sostenida sin degradación severa de rendimiento.
+
+### Casos de Prueba — Performance
+
+| Campo | TC-PERF |
+| :--- | :--- |
+| **ID** | TC-PERF |
+| **Tipo de Prueba** | Load Testing / Performance |
+| **Escenario** | Evaluar la capacidad del servicio antifraude para procesar evaluaciones de monto, ubicación y sospecha bajo carga progresiva (ramp-up a 50 VU simultáneos) |
+| **Precondiciones** | - Servicio fraud-service en ejecución y disponible en http://localhost:8080<br>- PostgreSQL 16 accesible<br>- k6 instalado en la máquina de pruebas |
+| **Perfil de Carga** | - **Ramp-up:** 30s para alcanzar 10 VU<br>- **Sustain:** 1m manteniendo 50 VU<br>- **Ramp-down:** 20s reducir a 0 VU<br>- **Total:** 2m 10s |
+| **Criterios de Aceptación** | - p95 response time < 500ms<br>- Error rate < 5%<br>- Throughput > 5 req/s<br>- Todas las HU (HU1, HU2, HU3) evaluadas |
+| **Pasos de ejecución** | 1. Iniciar servicio con `docker-compose up --build`<br>2. Ejecutar `k6 run k6-fraud/fraud_load_test.js`<br>3. Capturar métricas en tiempo real<br>4. Analizar resultados contra umbrales |
+| **Resultado esperado** | Todos los criterios de aceptación cumplidos; servicio escala a 50 VU con latencia <500ms p95 |
+| **Resultado obtenido** | **Ejecución completada:** p95 = 25.69s (51x sobre objetivo), Error rate = 2.88% ✅, Success rate = 97.12% ✅, Throughput = 5.6 req/s ✅. **Hallazgo crítico:** Falta de escalabilidad bajo carga; degradación severa en p95 con 50 VU (25.7s vs baseline 130ms). Probable cuello de botella en connection pooling de PostgreSQL. |
+| **Estado** | ⚠️ **Falló (Umbrales excedidos)** |
+| **Prioridad** | 🔴 Crítico |
+
+#### Detalles de Resultados
+
+**Resumen de Métricas:**
+- **Total de Solicitudes:** 729
+- **Solicitudes Exitosas:** 708 (97.12%)
+- **Solicitudes Fallidas:** 21 (2.88%)
+- **Promedio de Respuesta:** 2.95s
+- **p90 Respuesta:** 707ms
+- **p95 Respuesta:** 25.69s ❌ (Excede 500ms por 51x)
+- **Máximo de Respuesta:** 60s
+
+**Observaciones:**
+- ✅ Error rate dentro de tolerancia (2.88% < 5%)
+- ✅ Success rate superior al 97%
+- ✅ Operaciones HU1, HU2, HU3 todas evaluadas exitosamente
+- ❌ **Evento crítico:** Degradación exponencial de latencia con 50 VU concurrentes
+- ❌ **Request timeouts:** Observados durante fase de sustain
+- ⚠️ Cuello de botella probable: PostgreSQL connection pooling o JVM heap
+
+**Recomendación Inmediata:**
+1. Aumentar `spring.datasource.hikari.maximum-pool-size` en application.yml
+2. Revisar logs de PostgreSQL para queries lentas
+3. Implementar caching a nivel de applicación
+4. Retest después de optimización con ceiling de 10-20 VU
+
+---
+
 ## Resumen de Cobertura
 
 ### Totales por Historia de Usuario
@@ -441,10 +488,12 @@
 
 | Estado | Cantidad | Porcentaje |
 | :--- | :---: | :---: |
-| 🔘 Sin ejecutar | 26 | 100% |
+| 🔘 Sin ejecutar | 26 | 96.3% |
 | ✅ Pasó | 0 | 0% |
-| ❌ Falló | 0 | 0% |
+| ⚠️ Falló (Umbrales excedidos) | 1 (TC-PERF) | 3.7% |
+
+**Resumen:** Se ejecutó TC-PERF (Performance Load Test) el 2026-04-06. El test identificó limitaciones de escalabilidad en el servicio bajo carga concurrente de 50 VU. Los 26 casos funcionales de HU1-HU4 permanecen pendientes de ejecución.
 
 ---
 
-> **Nota:** Este documento es un entregable documental. Ningún caso de prueba ha sido ejecutado. Los campos de "Resultado obtenido" y "Estado" se actualizarán conforme avance la ejecución del Micro-Sprint.
+> **Nota:** Este documento incluye resultados de TC-PERF (Performance Test) ejecutado el 2026-04-06. Los casos de prueba funcionales (TC-001 a TC-026) están pendientes de ejecución. Los campos de "Resultado obtenido" y "Estado" se actualizarán conforme avance la ejecución del proyecto.
