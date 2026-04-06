@@ -137,6 +137,9 @@ mvn clean test -f karate-fraud/pom.xml -X
 # Windows PowerShell
 ii .\karate-fraud\target\karate-reports\karate-summary.html
 
+# Abrir explícitamente en Microsoft Edge
+Start-Process msedge.exe ".\karate-fraud\target\karate-reports\karate-summary.html"
+
 # Linux/Mac
 open ./karate-fraud/target/karate-reports/karate-summary.html
 ```
@@ -187,6 +190,35 @@ k6 run -u 100 -d 1m k6-fraud/fraud_load_test.js
 
 # Output en JSON para análisis
 k6 run -o json=results.json k6-fraud/fraud_load_test.js
+```
+
+**k6 + xk6-dashboard (Windows PowerShell) con reporte HTML en `k6-fraud`:**
+```powershell
+# Desde la raíz del repo Fraud_Detection
+$binDir = "$HOME\Downloads\xk6-dashboard_v0.8.1_windows_amd64\xk6-dashboard_v0.8.1_windows_amd64"
+
+# Si el binario viene sin extensión, renombrarlo una sola vez
+if (-not (Test-Path "$binDir\k6.exe") -and (Test-Path "$binDir\k6")) {
+    Rename-Item -Path "$binDir\k6" -NewName "k6.exe"
+}
+
+# URL del backend local
+$env:BASE_URL = "http://localhost:8080/api/v1"
+
+# Ejecutar y exportar reporte HTML dentro de k6-fraud
+& "$binDir\k6.exe" run --out "dashboard=export=./k6-fraud/fraud-report.html&port=-1" ./k6-fraud/fraud_load_test.js
+
+# Abrir reporte exportado
+ii .\k6-fraud\fraud-report.html
+
+# Abrir explícitamente en Microsoft Edge
+Start-Process msedge.exe ".\k6-fraud\fraud-report.html"
+```
+
+**Abrir dashboard en vivo durante la ejecución (opcional):**
+```powershell
+& "$binDir\k6.exe" run --out dashboard ./k6-fraud/fraud_load_test.js
+# Dashboard en vivo: http://127.0.0.1:5665
 ```
 
 ### Resultados de la última ejecución (2026-04-06)
