@@ -16,7 +16,9 @@ mediante Serenity BDD, Cucumber, Karate y k6, cubriendo pruebas funcionales, de 
 ## 📁 Estructura del Proyecto
 
 ```
-fraud-detection/
+Fraud_Detection/
+├── commit.instructions.md         # Instrucciones de commit
+├── README.md                      # Este archivo
 ├── Docs/                          # Documentación del proyecto
 │   ├── PRD.md                    # Visión y éxito del producto
 │   ├── USER_STORIES.md           # Historias de usuario (HU1-HU10)
@@ -26,17 +28,28 @@ fraud-detection/
 │   └── REALITY_CHECK.md          # Validaciones de realidad
 │
 ├── fraud-service/                # Backend microservicio
-│   ├── backend/transaction-service/  # API REST Spring Boot 3.x
-│   │   ├── src/main/java/com/fraud/
-│   │   │   ├── domain/           # Lógica de negocio
-│   │   │   ├── application/      # Casos de uso
-│   │   │   └── infrastructure/   # Controladores, DB, Config
-│   │   └── pom.xml
-│   ├── frontend/                 # UI React + Vite + Tailwind
+│   ├── DEV_TASKS.md              # Tareas de desarrollo
 │   ├── docker-compose.yml        # Orquestación local
-│   └── README.md
+│   ├── README.md                 # Documentación del servicio
+│   ├── backend/transaction-service/  # API REST Spring Boot 3.x
+│   │   ├── Dockerfile
+│   │   ├── pom.xml
+│   │   ├── README.md
+│   │   └── src/
+│   │       ├── main/
+│   │       └── test/
+│   └── frontend/                 # UI React + Vite + Tailwind
+│       ├── Dockerfile
+│       ├── package.json
+│       ├── tsconfig.json
+│       ├── vite.config.ts
+│       └── src/
+│           ├── components/
+│           ├── pages/
+│           └── ...
 │
 ├── karate-fraud/                 # Pruebas API (Karate)
+│   ├── pom.xml
 │   ├── src/test/java/co/sofka/fraud/
 │   │   └── FraudApiTest.java     # Test runner Karate
 │   ├── src/test/resources/
@@ -45,15 +58,17 @@ fraud-detection/
 │   │       ├── hu1_negative.feature   # TC-005–007 (Validaciones)
 │   │       ├── hu2_negative.feature   # TC-013–015, TC-018 (Datos faltantes)
 │   │       └── hu4_risk_levels.feature # TC-023–026 (Niveles riesgo)
-│   ├── target/karate-reports/   # HTML reports (generados)
-│   └── pom.xml
+│   └── target/karate-reports/   # HTML reports (generados)
 │
 ├── serenity-fraud/              # Pruebas BDD (Serenity + Cucumber)
+│   ├── pom.xml
 │   ├── src/test/java/         # Step definitions y runners
 │   ├── src/test/resources/    # Feature files (Gherkin)
-│   └── pom.xml
+│   └── target/site/serenity/  # Reportes Serenity
 │
-└── .agent/skills/              # Custom skills para modernization
+└── k6-fraud/                    # Pruebas de performance (k6)
+    ├── fraud_load_test.js      # Script de carga
+    └── fraud-report.html       # Reporte HTML generado
 ```
 
 ---
