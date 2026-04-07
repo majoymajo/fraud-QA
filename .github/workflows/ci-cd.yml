@@ -644,7 +644,7 @@ jobs:
             fi
           done
 
-      - name: OIDC auth scaffolding (TODO: provider-specific)
+      - name: "OIDC auth scaffolding (TODO: provider-specific)"
         run: |
           echo "Using OIDC role from production environment secret."
           echo "TODO: Replace with cloud provider login action using OIDC_ROLE_PRODUCTION and no static credentials."
