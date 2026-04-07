@@ -577,7 +577,8 @@ jobs:
       - secret-scan
       - sast-codeql
       - dependency-check
-    if: ${{ always() && needs.build-docker-backend.result == 'success' && needs.build-docker-frontend.result == 'success' && needs.attest-artifacts.result == 'success' && needs.unit-tests-backend.result == 'success' && needs.api-tests-karate.result == 'success' && needs.secret-scan.result == 'success' && needs.sast-codeql.result == 'success' && needs.dependency-check.result == 'success' && (vars.SERENITY_REQUIRED_FOR_STAGING != 'true' || needs.bdd-tests-serenity.result == 'success') }}    environment: staging
+    if: ${{ always() && needs.build-docker-backend.result == 'success' && needs.build-docker-frontend.result == 'success' && needs.attest-artifacts.result == 'success' && needs.unit-tests-backend.result == 'success' && needs.api-tests-karate.result == 'success' && needs.secret-scan.result == 'success' && needs.sast-codeql.result == 'success' && needs.dependency-check.result == 'success' && (vars.SERENITY_REQUIRED_FOR_STAGING != 'true' || needs.bdd-tests-serenity.result == 'success') }}
+    environment: staging
     permissions:
       contents: read
       id-token: write
