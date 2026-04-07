@@ -1,0 +1,3 @@
+[submodule "fraud-service"]
+	path = fraud-service
+	url = https://github.com/lasilvi/fraud-service.git
