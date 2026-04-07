@@ -1,17 +1,11 @@
 function fn() {
-  var env = karate.env || 'local';
-  var config = {
-    baseUrl: 'http://localhost:8080/api/v1'
+  const env = karate.env || 'local';
+  const baseUrlByEnv = {
+    local: 'http://localhost:8080/api/v1',
+    qa: 'http://qa.fraud-engine.sofka.co/api/v1',
+    staging: 'http://staging.fraud-engine.sofka.co/api/v1',
+    prod: 'https://api.fraud-engine.sofka.co/api/v1',
   };
-
-  if (env === 'qa') {
-    config.baseUrl = 'http://qa.fraud-engine.sofka.co/api/v1';
-  } else if (env === 'staging') {
-    config.baseUrl = 'http://staging.fraud-engine.sofka.co/api/v1';
-  } else if (env === 'prod') {
-    config.baseUrl = 'https://api.fraud-engine.sofka.co/api/v1';
-  }
-
-  karate.log('Base URL:', config.baseUrl);
-  return config;
+  const baseUrl = baseUrlByEnv[env] || baseUrlByEnv.local;
+  return { baseUrl };
 }

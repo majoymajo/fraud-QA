@@ -47,7 +47,6 @@
             <include>**/*Test.java</include>
           </includes>
           <systemPropertyVariables>
-            <!-- Override with -Dkarate.env=qa, -Dkarate.env=staging, etc. -->
             <karate.env>${karate.env}</karate.env>
           </systemPropertyVariables>
         </configuration>

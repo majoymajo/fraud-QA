@@ -10,21 +10,15 @@ import java.math.BigDecimal;
 
 import static net.serenitybdd.rest.SerenityRest.lastResponse;
 import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Shared step definitions used across HU1, HU2, and HU3 feature files.
- *
- * API Contract (from fraud-service source):
- *   POST /api/v1/fraud/evaluate
- *   Body: { "amount": <BigDecimal>, "transactionCountry": "<ISO-2/3>", "userCountry": "<ISO-2/3>", "ip": null }
- *   Response: { "suspicious": <boolean>, "riskLevel": "LOW|MEDIUM|HIGH", "reasons": [...] }
- */
 public class FraudCommonSteps {
 
-    private static final String BASE_URL = System.getProperty(
-        "fraud.service.base.url", "http://localhost:8080"
-    );
-    private static final String EVALUATE_ENDPOINT = BASE_URL + "/api/v1/fraud/evaluate";
+    private static final String SERVICE_BASE_URL = System.getProperty("fraud.service.base.url", "http://localhost:8080");
+    private static final String FRAUD_API_PREFIX = "/api/v1/fraud";
+    private static final String HEALTH_URL = SERVICE_BASE_URL + FRAUD_API_PREFIX + "/health";
+    private static final String EVALUATE_URL = SERVICE_BASE_URL + FRAUD_API_PREFIX + "/evaluate";
+    private static final String CLASSIFICATION_INUSUAL = "Inusual";
+    private static final String CLASSIFICATION_USUAL = "Usual";
+    private static final String RISK_LEVEL_LOW = "LOW";
 
     private BigDecimal amount;
     private String transactionCountry;
@@ -39,7 +33,7 @@ public class FraudCommonSteps {
     public void elServicioEstaDisponible() {
         SerenityRest
             .given()
-            .when().get(BASE_URL + "/api/v1/fraud/health")
+            .when().get(HEALTH_URL)
             .then().statusCode(200);
     }
 
@@ -53,38 +47,56 @@ public class FraudCommonSteps {
 
     @Cuando("la transacción es procesada por el sistema")
     public void laTransaccionEsProcesadaPorElSistema() {
-        String body = String.format(
-            "{\"amount\": %s, \"transactionCountry\": \"%s\", \"userCountry\": \"%s\"}",
-            amount.toPlainString(), transactionCountry, userCountry
-        );
+        String body = buildEvaluateRequestBody();
 
         SerenityRest
             .given()
             .contentType("application/json")
             .body(body)
-            .when().post(EVALUATE_ENDPOINT);
+            .when().post(EVALUATE_URL);
     }
 
     @Entonces("el sistema clasifica la transacción como {string}")
     public void elSistemaClasificaLaTransaccionComo(String clasificacion) {
-        assertThat(lastResponse().statusCode()).isEqualTo(200);
+        var response = lastResponse();
+        assertThat(response.statusCode()).isEqualTo(200);
 
-        boolean suspicious = lastResponse().jsonPath().getBoolean("suspicious");
-        String riskLevel = lastResponse().jsonPath().getString("riskLevel");
+        var jsonPath = response.jsonPath();
+        boolean suspicious = jsonPath.getBoolean("suspicious");
+        String riskLevel = jsonPath.getString("riskLevel");
 
-        if ("Inusual".equalsIgnoreCase(clasificacion)) {
-            // Inusual = suspicious or riskLevel != LOW
-            assertThat(suspicious || !"LOW".equalsIgnoreCase(riskLevel))
-                .as("Se esperaba clasificación Inusual pero suspicious=%s, riskLevel=%s", suspicious, riskLevel)
-                .isTrue();
-        } else if ("Usual".equalsIgnoreCase(clasificacion)) {
-            assertThat(suspicious)
-                .as("Se esperaba clasificación Usual (suspicious=false) pero fue suspicious=%s", suspicious)
-                .isFalse();
-            assertThat(riskLevel)
-                .as("Se esperaba riskLevel=LOW para Usual pero fue %s", riskLevel)
-                .isEqualToIgnoringCase("LOW");
+        if (CLASSIFICATION_INUSUAL.equalsIgnoreCase(clasificacion)) {
+            assertInusualClassification(suspicious, riskLevel);
+            return;
         }
+        if (CLASSIFICATION_USUAL.equalsIgnoreCase(clasificacion)) {
+            assertUsualClassification(suspicious, riskLevel);
+            return;
+        }
+
+        throw new IllegalArgumentException("Clasificación no soportada: " + clasificacion);
+    }
+
+    private static void assertInusualClassification(boolean suspicious, String riskLevel) {
+        assertThat(suspicious || !RISK_LEVEL_LOW.equalsIgnoreCase(riskLevel))
+            .as("Se esperaba clasificación %s pero suspicious=%s, riskLevel=%s", CLASSIFICATION_INUSUAL, suspicious, riskLevel)
+            .isTrue();
+    }
+
+    private static void assertUsualClassification(boolean suspicious, String riskLevel) {
+        assertThat(suspicious)
+            .as("Se esperaba clasificación %s pero suspicious=%s", CLASSIFICATION_USUAL, suspicious)
+            .isFalse();
+        assertThat(riskLevel)
+            .as("Se esperaba riskLevel=%s pero fue %s", RISK_LEVEL_LOW, riskLevel)
+            .isEqualToIgnoringCase(RISK_LEVEL_LOW);
+    }
+
+    private String buildEvaluateRequestBody() {
+        return String.format(
+            "{\"amount\": %s, \"transactionCountry\": \"%s\", \"userCountry\": \"%s\"}",
+            amount.toPlainString(), transactionCountry, userCountry
+        );
     }
 
     @Entonces("el campo suspicious es true")
