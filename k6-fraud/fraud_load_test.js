@@ -8,7 +8,7 @@ const metrics = {
   locationEvaluations: new Counter('location_evaluations'),
 };
 
-const BASE_URL = __ENV.BASE_URL ?? 'http://localhost:8080/api/v1';
+const BASE_URL = __ENV.BASE_URL || 'http://localhost:8080/api/v1';
 const EVALUATE_URL = `${BASE_URL}/fraud/evaluate`;
 const JSON_HEADERS = { headers: { 'Content-Type': 'application/json' } };
 
