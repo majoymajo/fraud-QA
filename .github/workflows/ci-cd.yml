@@ -1,0 +1,712 @@
+name: Fraud Platform CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: "17"
+  NODE_VERSION: "22"
+  SERENITY_REQUIRED_FOR_STAGING: ${{ vars.SERENITY_REQUIRED_FOR_STAGING || 'false' }}
+
+jobs:
+  build-backend:
+    name: Build Backend and Test Modules
+    runs-on: ubuntu-latest
+    needs: []
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: |
+            fraud-service/backend/transaction-service/pom.xml
+            karate-fraud/pom.xml
+            serenity-fraud/pom.xml
+
+      - name: Build backend
+        run: mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml clean package -DskipTests
+
+      - name: Build Karate test module
+        run: mvn -B -ntp -f karate-fraud/pom.xml clean test-compile -DskipTests
+
+      - name: Build Serenity test module
+        run: mvn -B -ntp -f serenity-fraud/pom.xml clean test-compile -DskipTests
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: fraud-service/backend/transaction-service/target/*.jar
+          if-no-files-found: error
+          retention-days: 14
+
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    needs: []
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: fraud-service/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: fraud-service/frontend/package-lock.json
+
+      - name: Verify lockfile exists
+        run: test -f package-lock.json
+
+      - name: Deterministic install
+        run: npm ci
+
+      - name: Verify lockfile unchanged
+        run: git diff --exit-code -- package-lock.json
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Upload frontend dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: fraud-service/frontend/dist
+          if-no-files-found: error
+          retention-days: 14
+
+  unit-tests-backend:
+    name: Unit Tests Backend
+    runs-on: ubuntu-latest
+    needs: [build-backend]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: fraud-service/backend/transaction-service/pom.xml
+
+      - name: Run backend unit tests
+        run: mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml test
+
+      - name: Upload JUnit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            fraud-service/backend/transaction-service/target/surefire-reports/**
+            fraud-service/backend/transaction-service/target/failsafe-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Annotate failure
+        if: failure()
+        run: echo "::error title=Backend unit tests failed::See backend-test-reports artifact for details."
+
+  api-tests-karate:
+    name: API Tests Karate
+    runs-on: ubuntu-latest
+    needs: [build-backend]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: |
+            fraud-service/backend/transaction-service/pom.xml
+            karate-fraud/pom.xml
+
+      - name: Start postgres
+        run: docker compose -f fraud-service/docker-compose.yml up -d postgres
+
+      - name: Start backend locally
+        run: |
+          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run \
+            -Dspring-boot.run.jvmArguments="-DDB_URL=jdbc:postgresql://localhost:5433/frauddb -DDB_USERNAME=fraud -DDB_PASSWORD=fraud" \
+            > backend-karate.log 2>&1 &
+
+      - name: Wait for backend health
+        run: |
+          for i in {1..60}; do
+            if curl -fsS "http://localhost:8080/api/v1/fraud/health" >/dev/null; then
+              echo "Backend is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error title=Backend startup timeout::Service did not become healthy in time."
+          tail -n 200 backend-karate.log || true
+          exit 1
+
+      - name: Run Karate tests
+        run: mvn -B -ntp -f karate-fraud/pom.xml test -Dkarate.env=local
+
+      - name: Stop backend and postgres
+        if: always()
+        run: |
+          pkill -f "spring-boot:run" || true
+          docker compose -f fraud-service/docker-compose.yml down
+
+      - name: Upload Karate reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: karate-reports
+          path: |
+            karate-fraud/target/karate-reports/**
+            karate-fraud/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Annotate failure
+        if: failure()
+        run: echo "::error title=Karate API tests failed::See karate-reports artifact for details."
+
+  bdd-tests-serenity:
+    name: BDD Tests Serenity
+    runs-on: ubuntu-latest
+    needs: [build-backend]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: |
+            fraud-service/backend/transaction-service/pom.xml
+            serenity-fraud/pom.xml
+
+      - name: Start postgres
+        run: docker compose -f fraud-service/docker-compose.yml up -d postgres
+
+      - name: Start backend locally
+        run: |
+          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run \
+            -Dspring-boot.run.jvmArguments="-DDB_URL=jdbc:postgresql://localhost:5433/frauddb -DDB_USERNAME=fraud -DDB_PASSWORD=fraud" \
+            > backend-serenity.log 2>&1 &
+
+      - name: Wait for backend health
+        run: |
+          for i in {1..60}; do
+            if curl -fsS "http://localhost:8080/api/v1/fraud/health" >/dev/null; then
+              echo "Backend is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error title=Backend startup timeout::Service did not become healthy in time."
+          tail -n 200 backend-serenity.log || true
+          exit 1
+
+      - name: Run Serenity BDD tests
+        run: mvn -B -ntp -f serenity-fraud/pom.xml verify -Dfraud.service.base.url=http://localhost:8080
+
+      - name: Stop backend and postgres
+        if: always()
+        run: |
+          pkill -f "spring-boot:run" || true
+          docker compose -f fraud-service/docker-compose.yml down
+
+      - name: Upload Serenity reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: serenity-reports
+          path: |
+            serenity-fraud/target/site/serenity/**
+            serenity-fraud/target/failsafe-reports/**
+            serenity-fraud/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Annotate failure
+        if: failure()
+        run: echo "::error title=Serenity BDD tests failed::See serenity-reports artifact for details."
+
+  performance-tests-k6:
+    name: Performance Tests k6
+    runs-on: ubuntu-latest
+    needs: [build-backend]
+    permissions:
+      contents: read
+    outputs:
+      thresholds_passed: ${{ steps.threshold-eval.outputs.thresholds_passed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: fraud-service/backend/transaction-service/pom.xml
+
+      - name: Set up k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Start postgres
+        run: docker compose -f fraud-service/docker-compose.yml up -d postgres
+
+      - name: Start backend locally
+        run: |
+          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run \
+            -Dspring-boot.run.jvmArguments="-DDB_URL=jdbc:postgresql://localhost:5433/frauddb -DDB_USERNAME=fraud -DDB_PASSWORD=fraud" \
+            > backend-k6.log 2>&1 &
+
+      - name: Wait for backend health
+        run: |
+          for i in {1..60}; do
+            if curl -fsS "http://localhost:8080/api/v1/fraud/health" >/dev/null; then
+              echo "Backend is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error title=Backend startup timeout::Service did not become healthy in time."
+          tail -n 200 backend-k6.log || true
+          exit 1
+
+      - name: Run k6 load test
+        id: k6-run
+        run: |
+          set +e
+          k6 run --summary-export=k6-fraud/k6-summary.json --out json=k6-fraud/k6-results.json k6-fraud/fraud_load_test.js
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Evaluate k6 thresholds
+        id: threshold-eval
+        run: |
+          node -e "
+          const fs = require('fs');
+          const p = 'k6-fraud/k6-summary.json';
+          if (!fs.existsSync(p)) {
+            console.log('::error title=k6 summary missing::k6-fraud/k6-summary.json was not produced.');
+            process.exit(1);
+          }
+          const summary = JSON.parse(fs.readFileSync(p, 'utf8'));
+          const metrics = summary.metrics || {};
+          let ok = true;
+          for (const metric of Object.values(metrics)) {
+            const thresholds = metric.thresholds || {};
+            for (const t of Object.values(thresholds)) {
+              if (t.ok === false) ok = false;
+            }
+          }
+          console.log(`thresholds_passed=${ok}`);
+          require('fs').appendFileSync(process.env.GITHUB_OUTPUT, `thresholds_passed=${ok}\n`);
+          if (!ok) {
+            console.log('::warning title=k6 thresholds failed::Staging can proceed as warning; production will be blocked.');
+          }
+          "
+
+      - name: Stop backend and postgres
+        if: always()
+        run: |
+          pkill -f "spring-boot:run" || true
+          docker compose -f fraud-service/docker-compose.yml down
+
+      - name: Upload k6 outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-results
+          path: |
+            k6-fraud/k6-summary.json
+            k6-fraud/k6-results.json
+            k6-fraud/fraud-report.html
+          if-no-files-found: warn
+          retention-days: 14
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    needs: []
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Annotate failure
+        if: failure()
+        run: echo "::error title=Secret scan failed::Potential leaked secret detected."
+
+  sast-codeql:
+    name: SAST CodeQL
+    runs-on: ubuntu-latest
+    needs: []
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java,javascript-typescript
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+
+  dependency-check:
+    name: Dependency Vulnerability Check
+    runs-on: ubuntu-latest
+    needs: []
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trivy dependency scan (high/critical)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scanners: vuln
+          vuln-type: library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: sarif
+          output: trivy-dependencies.sarif
+          exit-code: "1"
+
+      - name: Upload dependency SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-dependencies.sarif
+
+      - name: Upload dependency scan artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-scan-sarif
+          path: trivy-dependencies.sarif
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Annotate failure
+        if: failure()
+        run: echo "::error title=Dependency check failed::High/Critical dependency vulnerabilities found."
+
+  build-docker-backend:
+    name: Build Docker Backend
+    runs-on: ubuntu-latest
+    needs:
+      - build-backend
+      - build-frontend
+      - unit-tests-backend
+      - api-tests-karate
+      - secret-scan
+      - sast-codeql
+      - dependency-check
+    permissions:
+      contents: read
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set branch tag
+        id: branch
+        run: echo "tag=$(echo \"${GITHUB_REF_NAME}\" | tr '/[:upper:]' '-[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: fraud-service/backend/transaction-service
+          file: fraud-service/backend/transaction-service/Dockerfile
+          push: false
+          tags: |
+            ${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_REPOSITORY_BACKEND }}:${{ github.sha }}
+            ${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_REPOSITORY_BACKEND }}:${{ steps.branch.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          sbom: true
+
+  build-docker-frontend:
+    name: Build Docker Frontend
+    runs-on: ubuntu-latest
+    needs:
+      - build-backend
+      - build-frontend
+      - unit-tests-backend
+      - api-tests-karate
+      - secret-scan
+      - sast-codeql
+      - dependency-check
+    permissions:
+      contents: read
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set branch tag
+        id: branch
+        run: echo "tag=$(echo \"${GITHUB_REF_NAME}\" | tr '/[:upper:]' '-[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: fraud-service/frontend
+          file: fraud-service/frontend/Dockerfile
+          push: false
+          tags: |
+            ${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_REPOSITORY_FRONTEND }}:${{ github.sha }}
+            ${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_REPOSITORY_FRONTEND }}:${{ steps.branch.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          sbom: true
+
+  attest-artifacts:
+    name: Attest Build Artifacts
+    runs-on: ubuntu-latest
+    needs: [build-docker-backend, build-docker-frontend, build-backend, build-frontend]
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    steps:
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-jar
+          path: attest/backend
+
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: attest/frontend
+
+      - name: Attest backend artifact provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: attest/backend/**
+
+      - name: Attest frontend artifact provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: attest/frontend/**
+
+  deploy-staging:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+    needs:
+      - build-docker-backend
+      - build-docker-frontend
+      - attest-artifacts
+      - unit-tests-backend
+      - api-tests-karate
+      - bdd-tests-serenity
+      - performance-tests-k6
+      - secret-scan
+      - sast-codeql
+      - dependency-check
+    if: ${{ always() && needs.build-docker-backend.result == 'success' && needs.build-docker-frontend.result == 'success' && needs.attest-artifacts.result == 'success' && needs.unit-tests-backend.result == 'success' && needs.api-tests-karate.result == 'success' && needs.secret-scan.result == 'success' && needs.sast-codeql.result == 'success' && needs.dependency-check.result == 'success' && (env.SERENITY_REQUIRED_FOR_STAGING != 'true' || needs.bdd-tests-serenity.result == 'success') }}
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      deployment_status: ${{ steps.deploy.outputs.status }}
+    steps:
+      - name: Validate required staging secrets
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_REPOSITORY_BACKEND: ${{ secrets.REGISTRY_REPOSITORY_BACKEND }}
+          REGISTRY_REPOSITORY_FRONTEND: ${{ secrets.REGISTRY_REPOSITORY_FRONTEND }}
+          OIDC_ROLE_STAGING: ${{ secrets.OIDC_ROLE_STAGING }}
+          DEPLOY_TARGET_STAGING: ${{ secrets.DEPLOY_TARGET_STAGING }}
+        run: |
+          for v in REGISTRY_URL REGISTRY_REPOSITORY_BACKEND REGISTRY_REPOSITORY_FRONTEND OIDC_ROLE_STAGING DEPLOY_TARGET_STAGING; do
+            if [ -z "${!v}" ]; then
+              echo "::error title=Missing required staging secret::$v must be set in staging environment secrets."
+              exit 1
+            fi
+          done
+
+      - name: OIDC auth scaffolding (TODO: provider-specific)
+        run: |
+          echo "Using OIDC role from staging environment secret."
+          echo "TODO: Replace with cloud provider login action using OIDC_ROLE_STAGING and no static credentials."
+
+      - name: Deploy to staging target (TODO)
+        id: deploy
+        env:
+          DEPLOY_TARGET_STAGING: ${{ secrets.DEPLOY_TARGET_STAGING }}
+        run: |
+          echo "TODO: Deploy backend/frontend images to ${DEPLOY_TARGET_STAGING}."
+          echo "status=success" >> "$GITHUB_OUTPUT"
+
+      - name: Annotate k6 threshold warning
+        if: ${{ needs.performance-tests-k6.outputs.thresholds_passed != 'true' }}
+        run: echo "::warning title=k6 thresholds failed::Staging deploy proceeded by policy, production will be blocked."
+
+  deploy-production:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, bdd-tests-serenity, performance-tests-k6]
+    if: ${{ always() && needs.deploy-staging.result == 'success' && needs.bdd-tests-serenity.result == 'success' && needs.performance-tests-k6.outputs.thresholds_passed == 'true' }}
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      deployment_status: ${{ steps.deploy.outputs.status }}
+    steps:
+      - name: Validate required production secrets
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_REPOSITORY_BACKEND: ${{ secrets.REGISTRY_REPOSITORY_BACKEND }}
+          REGISTRY_REPOSITORY_FRONTEND: ${{ secrets.REGISTRY_REPOSITORY_FRONTEND }}
+          OIDC_ROLE_PRODUCTION: ${{ secrets.OIDC_ROLE_PRODUCTION }}
+          DEPLOY_TARGET_PRODUCTION: ${{ secrets.DEPLOY_TARGET_PRODUCTION }}
+        run: |
+          for v in REGISTRY_URL REGISTRY_REPOSITORY_BACKEND REGISTRY_REPOSITORY_FRONTEND OIDC_ROLE_PRODUCTION DEPLOY_TARGET_PRODUCTION; do
+            if [ -z "${!v}" ]; then
+              echo "::error title=Missing required production secret::$v must be set in production environment secrets."
+              exit 1
+            fi
+          done
+
+      - name: OIDC auth scaffolding (TODO: provider-specific)
+        run: |
+          echo "Using OIDC role from production environment secret."
+          echo "TODO: Replace with cloud provider login action using OIDC_ROLE_PRODUCTION and no static credentials."
+
+      - name: Deploy to production target (TODO)
+        id: deploy
+        env:
+          DEPLOY_TARGET_PRODUCTION: ${{ secrets.DEPLOY_TARGET_PRODUCTION }}
+        run: |
+          echo "TODO: Deploy backend/frontend images to ${DEPLOY_TARGET_PRODUCTION}."
+          echo "status=success" >> "$GITHUB_OUTPUT"
+
+  workflow-summary:
+    name: Workflow Summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - build-backend
+      - build-frontend
+      - unit-tests-backend
+      - api-tests-karate
+      - bdd-tests-serenity
+      - performance-tests-k6
+      - secret-scan
+      - sast-codeql
+      - dependency-check
+      - build-docker-backend
+      - build-docker-frontend
+      - attest-artifacts
+      - deploy-staging
+      - deploy-production
+    permissions:
+      contents: read
+    steps:
+      - name: Publish workflow summary
+        run: |
+          {
+            echo "## Fraud Platform CI/CD Summary"
+            echo ""
+            echo "### Build Status"
+            echo "- Backend build: ${{ needs.build-backend.result }}"
+            echo "- Frontend build: ${{ needs.build-frontend.result }}"
+            echo "- Docker backend: ${{ needs.build-docker-backend.result }}"
+            echo "- Docker frontend: ${{ needs.build-docker-frontend.result }}"
+            echo ""
+            echo "### Test Status"
+            echo "- Backend unit tests: ${{ needs.unit-tests-backend.result }}"
+            echo "- Karate API tests: ${{ needs.api-tests-karate.result }}"
+            echo "- Serenity BDD tests: ${{ needs.bdd-tests-serenity.result }}"
+            echo "- k6 performance tests: ${{ needs.performance-tests-k6.result }}"
+            echo "- k6 thresholds passed: ${{ needs.performance-tests-k6.outputs.thresholds_passed }}"
+            echo ""
+            echo "### Security Findings Status"
+            echo "- Secret scan: ${{ needs.secret-scan.result }}"
+            echo "- CodeQL SAST: ${{ needs.sast-codeql.result }}"
+            echo "- Dependency check (HIGH/CRITICAL): ${{ needs.dependency-check.result }}"
+            echo ""
+            echo "### Image Digests"
+            echo "- Backend digest: ${{ needs.build-docker-backend.outputs.image_digest }}"
+            echo "- Frontend digest: ${{ needs.build-docker-frontend.outputs.image_digest }}"
+            echo ""
+            echo "### Deployment Status"
+            echo "- Staging: ${{ needs.deploy-staging.result }}"
+            echo "- Production: ${{ needs.deploy-production.result }}"
+          } >> "$GITHUB_STEP_SUMMARY"
