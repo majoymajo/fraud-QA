@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -69,6 +71,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -109,6 +113,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -145,6 +151,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -211,6 +219,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -280,6 +290,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -377,6 +389,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: true
 
       - name: Run gitleaks
         uses: gitleaks/gitleaks-action@v2
@@ -398,14 +411,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: |
+            fraud-service/backend/transaction-service/pom.xml
+            karate-fraud/pom.xml
+            serenity-fraud/pom.xml
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: java,javascript-typescript
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+      - name: Build Java codebase
+        run: |
+          mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml clean install -DskipTests
+          mvn -B -ntp -f karate-fraud/pom.xml clean install -DskipTests
+          mvn -B -ntp -f serenity-fraud/pom.xml clean install -DskipTests
 
       - name: Analyze
         uses: github/codeql-action/analyze@v3
@@ -420,9 +449,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Trivy dependency scan (high/critical)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scanners: vuln
@@ -470,6 +501,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set branch tag
         id: branch
@@ -510,6 +543,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Set branch tag
         id: branch
