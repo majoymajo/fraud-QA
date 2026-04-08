@@ -17,7 +17,7 @@ Feature: HU2 – Validaciones y tolerancia a datos faltantes (API)
   @TC-014 @alto
   Scenario: País de transacción vacío se rechaza con 400
     Given path 'fraud', 'evaluate'
-    And request { amount: 1000, transactionCountry: '', userCountry: 'CO', ip: '10.0.0.1' }
+    And request { amount: 1000, transactionCountry: null, userCountry: 'CO', ip: '10.0.0.1' }
     When method post
     Then status 400
     And match response.error == 'Validation failed'
