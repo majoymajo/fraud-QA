@@ -124,7 +124,7 @@ git checkout Karate
 
 # 3. Levantar stack (Postgres + Backend + Frontend)
 cd fraud-service
-docker compose up -d --build postgres fraud-service
+docker compose up -d --build
 
 # 4. Verificar salud del backend
 curl http://localhost:8080/api/v1/fraud/health
