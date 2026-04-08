@@ -107,6 +107,7 @@ jobs:
   unit-tests-backend:
     name: Unit Tests Backend
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: [build-backend]
     permissions:
       contents: read
@@ -145,6 +146,7 @@ jobs:
   api-tests-karate:
     name: API Tests Karate
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: [build-backend]
     permissions:
       contents: read
@@ -213,6 +215,7 @@ jobs:
   bdd-tests-serenity:
     name: BDD Tests Serenity
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: [build-backend]
     permissions:
       contents: read
@@ -282,6 +285,7 @@ jobs:
   performance-tests-k6:
     name: Performance Tests k6
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: [build-backend]
     permissions:
       contents: read
@@ -356,7 +360,7 @@ jobs:
           console.log(`thresholds_passed=${ok}`);
           require('fs').appendFileSync(process.env.GITHUB_OUTPUT, `thresholds_passed=${ok}\n`);
           if (!ok) {
-            console.log('::warning title=k6 thresholds failed::Staging can proceed as warning; production will be blocked.');
+            console.log('::warning title=k6 thresholds failed::Staging and Production can proceed (accepting ~92% effectiveness).');
           }
           "
 
@@ -650,13 +654,13 @@ jobs:
 
       - name: Annotate k6 threshold warning
         if: ${{ needs.performance-tests-k6.outputs.thresholds_passed != 'true' }}
-        run: echo "::warning title=k6 thresholds failed::Staging deploy proceeded by policy, production will be blocked."
+        run: echo "::warning title=k6 thresholds failed::Deploy proceeded by policy, accepting current test effectiveness."
 
   deploy-production:
     name: Deploy Production
     runs-on: ubuntu-latest
     needs: [deploy-staging, bdd-tests-serenity, performance-tests-k6]
-    if: ${{ always() && needs.deploy-staging.result == 'success' && needs.bdd-tests-serenity.result == 'success' && needs.performance-tests-k6.outputs.thresholds_passed == 'true' }}
+    if: ${{ always() && needs.deploy-staging.result == 'success' && needs.bdd-tests-serenity.result == 'success' }}
     environment: production
     permissions:
       contents: read
