@@ -169,11 +169,27 @@ jobs:
       - name: Start postgres
         run: docker compose -f fraud-service/docker-compose.yml up -d postgres
 
-      - name: Start backend locally
+      - name: Wait for postgres health
         run: |
-          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run \
-            -Dspring-boot.run.jvmArguments="-DDB_URL=jdbc:postgresql://localhost:5433/frauddb -DDB_USERNAME=fraud -DDB_PASSWORD=fraud" \
-            > backend-karate.log 2>&1 &
+          for i in {1..60}; do
+            status=$(docker inspect -f '{{.State.Health.Status}}' fraud-postgres 2>/dev/null || echo "starting")
+            if [ "$status" = "healthy" ]; then
+              echo "Postgres is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error title=Postgres startup timeout::Container did not become healthy in time."
+          docker logs fraud-postgres --tail 200 || true
+          exit 1
+
+      - name: Start backend locally
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/frauddb
+          DB_USERNAME: fraud
+          DB_PASSWORD: fraud
+        run: |
+          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run > backend-karate.log 2>&1 &
 
       - name: Wait for backend health
         run: |
@@ -238,11 +254,27 @@ jobs:
       - name: Start postgres
         run: docker compose -f fraud-service/docker-compose.yml up -d postgres
 
-      - name: Start backend locally
+      - name: Wait for postgres health
         run: |
-          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run \
-            -Dspring-boot.run.jvmArguments="-DDB_URL=jdbc:postgresql://localhost:5433/frauddb -DDB_USERNAME=fraud -DDB_PASSWORD=fraud" \
-            > backend-serenity.log 2>&1 &
+          for i in {1..60}; do
+            status=$(docker inspect -f '{{.State.Health.Status}}' fraud-postgres 2>/dev/null || echo "starting")
+            if [ "$status" = "healthy" ]; then
+              echo "Postgres is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error title=Postgres startup timeout::Container did not become healthy in time."
+          docker logs fraud-postgres --tail 200 || true
+          exit 1
+
+      - name: Start backend locally
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/frauddb
+          DB_USERNAME: fraud
+          DB_PASSWORD: fraud
+        run: |
+          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run > backend-serenity.log 2>&1 &
 
       - name: Wait for backend health
         run: |
@@ -311,11 +343,27 @@ jobs:
       - name: Start postgres
         run: docker compose -f fraud-service/docker-compose.yml up -d postgres
 
-      - name: Start backend locally
+      - name: Wait for postgres health
         run: |
-          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run \
-            -Dspring-boot.run.jvmArguments="-DDB_URL=jdbc:postgresql://localhost:5433/frauddb -DDB_USERNAME=fraud -DDB_PASSWORD=fraud" \
-            > backend-k6.log 2>&1 &
+          for i in {1..60}; do
+            status=$(docker inspect -f '{{.State.Health.Status}}' fraud-postgres 2>/dev/null || echo "starting")
+            if [ "$status" = "healthy" ]; then
+              echo "Postgres is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error title=Postgres startup timeout::Container did not become healthy in time."
+          docker logs fraud-postgres --tail 200 || true
+          exit 1
+
+      - name: Start backend locally
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/frauddb
+          DB_USERNAME: fraud
+          DB_PASSWORD: fraud
+        run: |
+          nohup mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml spring-boot:run > backend-k6.log 2>&1 &
 
       - name: Wait for backend health
         run: |
