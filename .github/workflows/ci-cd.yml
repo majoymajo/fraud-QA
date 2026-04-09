@@ -107,7 +107,6 @@ jobs:
   unit-tests-backend:
     name: Unit Tests Backend
     runs-on: ubuntu-latest
-    continue-on-error: true
     needs: [build-backend]
     permissions:
       contents: read
@@ -126,30 +125,37 @@ jobs:
           cache-dependency-path: fraud-service/backend/transaction-service/pom.xml
 
       - name: Run backend unit tests
-        run: mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml test
+        run: mvn -B -ntp -f fraud-service/backend/transaction-service/pom.xml test -Dmaven.test.failure.ignore=true
 
-      - name: Evaluate backend unit test effectiveness
+      - name: Evaluate backend test failure threshold (<= 1)
         if: always()
         run: |
-          set +e
-          if [ -d "fraud-service/backend/transaction-service/target/surefire-reports" ]; then
-            TEST_FILES=$(find fraud-service/backend/transaction-service/target/surefire-reports -name "*.xml" | wc -l)
-            if [ "$TEST_FILES" -gt 0 ]; then
-              TOTAL=$(grep -h "<testcase" fraud-service/backend/transaction-service/target/surefire-reports/*.xml 2>/dev/null | wc -l)
-              FAILED=$(grep -h "<failure" fraud-service/backend/transaction-service/target/surefire-reports/*.xml 2>/dev/null | wc -l)
-              if [ "$TOTAL" -gt 0 ]; then
-                PASSED=$((TOTAL - FAILED))
-                EFFECTIVENESS=$((PASSED * 100 / TOTAL))
-                echo "Unit Test Effectiveness: $EFFECTIVENESS% ($PASSED/$TOTAL tests passed)"
-                if [ "$EFFECTIVENESS" -ge 90 ]; then
-                  echo "::notice title=Unit Tests Effective::Backend unit tests at $EFFECTIVENESS% effectiveness (>= 90% threshold). Marking as successful."
-                  exit 0
-                fi
-              fi
-            fi
+          REPORT_DIR="fraud-service/backend/transaction-service/target/surefire-reports"
+          if [ ! -d "$REPORT_DIR" ]; then
+            echo "::error title=Missing test reports::Expected report directory $REPORT_DIR was not found."
+            exit 1
           fi
-          echo "::notice title=Unit Tests Executed::Backend unit tests executed with acceptable effectiveness."
-          exit 0
+
+          REPORT_COUNT=$(find "$REPORT_DIR" -name "*.xml" | wc -l)
+          if [ "$REPORT_COUNT" -eq 0 ]; then
+            echo "::error title=Missing test report files::No JUnit XML reports were generated in $REPORT_DIR."
+            exit 1
+          fi
+
+          TOTAL=$(find "$REPORT_DIR" -name "*.xml" -exec sed -n 's/.*tests="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          FAILURES=$(find "$REPORT_DIR" -name "*.xml" -exec sed -n 's/.*failures="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          ERRORS=$(find "$REPORT_DIR" -name "*.xml" -exec sed -n 's/.*errors="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          BROKEN=$((FAILURES + ERRORS))
+
+          echo "Backend unit test summary: total=$TOTAL failures=$FAILURES errors=$ERRORS allowed_max=1"
+
+          if [ "$BROKEN" -le 1 ]; then
+            echo "::notice title=Backend test threshold passed::Detected $BROKEN failing/broken tests (<= 1 allowed)."
+            exit 0
+          fi
+
+          echo "::error title=Backend test threshold failed::Detected $BROKEN failing/broken tests (> 1 allowed)."
+          exit 1
 
       - name: Upload JUnit reports
         if: always()
@@ -169,7 +175,6 @@ jobs:
   api-tests-karate:
     name: API Tests Karate
     runs-on: ubuntu-latest
-    continue-on-error: true
     needs: [build-backend]
     permissions:
       contents: read
@@ -228,7 +233,7 @@ jobs:
           exit 1
 
       - name: Run Karate tests
-        run: mvn -B -ntp -f karate-fraud/pom.xml test -Dkarate.env=local
+        run: mvn -B -ntp -f karate-fraud/pom.xml test -Dkarate.env=local -Dmaven.test.failure.ignore=true
 
       - name: Stop backend and postgres
         if: always()
@@ -247,28 +252,35 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Evaluate Karate test effectiveness
+      - name: Evaluate Karate test failure threshold (<= 1)
         if: always()
         run: |
-          set +e
-          # Extract test results from surefire reports if available
-          if [ -f "karate-fraud/target/surefire-reports/co.sofka.fraud.FraudApiTest.txt" ]; then
-            TEST_OUTPUT=$(cat "karate-fraud/target/surefire-reports/co.sofka.fraud.FraudApiTest.txt")
-            TOTAL=$(echo "$TEST_OUTPUT" | grep -oP 'Tests run: \K[0-9]+' || echo "0")
-            FAILURES=$(echo "$TEST_OUTPUT" | grep -oP 'Failures: \K[0-9]+' || echo "0")
-            if [ "$TOTAL" -gt 0 ]; then
-              PASSED=$((TOTAL - FAILURES))
-              EFFECTIVENESS=$((PASSED * 100 / TOTAL))
-              echo "Karate Test Effectiveness: $EFFECTIVENESS% ($PASSED/$TOTAL tests passed)"
-              if [ "$EFFECTIVENESS" -ge 90 ]; then
-                echo "::notice title=Karate Tests Effective::Test suite at $EFFECTIVENESS% effectiveness (>= 90% threshold). Marking as successful."
-                exit 0
-              fi
-            fi
+          REPORT_DIR="karate-fraud/target/surefire-reports"
+          if [ ! -d "$REPORT_DIR" ]; then
+            echo "::error title=Missing Karate reports::Expected report directory $REPORT_DIR was not found."
+            exit 1
           fi
-          # If we get here, assume success if job didn't hard fail
-          echo "::notice title=Karate Tests Executed::Test suite executed. Checking reports in artifacts."
-          exit 0
+
+          REPORT_COUNT=$(find "$REPORT_DIR" -name "*.xml" | wc -l)
+          if [ "$REPORT_COUNT" -eq 0 ]; then
+            echo "::error title=Missing Karate report files::No JUnit XML reports were generated in $REPORT_DIR."
+            exit 1
+          fi
+
+          TOTAL=$(find "$REPORT_DIR" -name "*.xml" -exec sed -n 's/.*tests="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          FAILURES=$(find "$REPORT_DIR" -name "*.xml" -exec sed -n 's/.*failures="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          ERRORS=$(find "$REPORT_DIR" -name "*.xml" -exec sed -n 's/.*errors="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          BROKEN=$((FAILURES + ERRORS))
+
+          echo "Karate test summary: total=$TOTAL failures=$FAILURES errors=$ERRORS allowed_max=1"
+
+          if [ "$BROKEN" -le 1 ]; then
+            echo "::notice title=Karate test threshold passed::Detected $BROKEN failing/broken tests (<= 1 allowed)."
+            exit 0
+          fi
+
+          echo "::error title=Karate test threshold failed::Detected $BROKEN failing/broken tests (> 1 allowed)."
+          exit 1
 
       - name: Annotate failure
         if: failure()
@@ -277,7 +289,6 @@ jobs:
   bdd-tests-serenity:
     name: BDD Tests Serenity
     runs-on: ubuntu-latest
-    continue-on-error: true
     needs: [build-backend]
     permissions:
       contents: read
@@ -336,7 +347,7 @@ jobs:
           exit 1
 
       - name: Run Serenity BDD tests
-        run: mvn -B -ntp -f serenity-fraud/pom.xml verify -Dfraud.service.base.url=http://localhost:8080
+        run: mvn -B -ntp -f serenity-fraud/pom.xml verify -Dfraud.service.base.url=http://localhost:8080 -Dmaven.test.failure.ignore=true
 
       - name: Stop backend and postgres
         if: always()
@@ -356,28 +367,29 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Evaluate Serenity test effectiveness
+      - name: Evaluate Serenity test failure threshold (<= 1)
         if: always()
         run: |
-          set +e
-          # Extract test results from failsafe reports if available
-          if [ -f "serenity-fraud/target/failsafe-reports/co.sofka.fraud.runners.FraudTestSuite.txt" ]; then
-            TEST_OUTPUT=$(cat "serenity-fraud/target/failsafe-reports/co.sofka.fraud.runners.FraudTestSuite.txt")
-            TOTAL=$(echo "$TEST_OUTPUT" | grep -oP 'Tests run: \K[0-9]+' || echo "0")
-            FAILURES=$(echo "$TEST_OUTPUT" | grep -oP 'Failures: \K[0-9]+' || echo "0")
-            if [ "$TOTAL" -gt 0 ]; then
-              PASSED=$((TOTAL - FAILURES))
-              EFFECTIVENESS=$((PASSED * 100 / TOTAL))
-              echo "Serenity Test Effectiveness: $EFFECTIVENESS% ($PASSED/$TOTAL scenarios executed)"
-              if [ "$EFFECTIVENESS" -ge 90 ]; then
-                echo "::notice title=Serenity Tests Effective::BDD suite at $EFFECTIVENESS% effectiveness (>= 90% threshold). Marking as successful."
-                exit 0
-              fi
-            fi
+          REPORT_COUNT=$(find serenity-fraud/target/failsafe-reports serenity-fraud/target/surefire-reports -type f -name "*.xml" 2>/dev/null | wc -l)
+          if [ "$REPORT_COUNT" -eq 0 ]; then
+            echo "::error title=Missing Serenity report files::No XML reports were generated in failsafe/surefire folders."
+            exit 1
           fi
-          # If we get here, assume success if job didn't hard fail
-          echo "::notice title=Serenity Tests Executed::BDD suite executed. Checking reports in artifacts."
-          exit 0
+
+          TOTAL=$(find serenity-fraud/target/failsafe-reports serenity-fraud/target/surefire-reports -type f -name "*.xml" 2>/dev/null -exec sed -n 's/.*tests="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          FAILURES=$(find serenity-fraud/target/failsafe-reports serenity-fraud/target/surefire-reports -type f -name "*.xml" 2>/dev/null -exec sed -n 's/.*failures="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          ERRORS=$(find serenity-fraud/target/failsafe-reports serenity-fraud/target/surefire-reports -type f -name "*.xml" 2>/dev/null -exec sed -n 's/.*errors="\([0-9]\+\)".*/\1/p' {} + | awk '{s+=$1} END{print s+0}')
+          BROKEN=$((FAILURES + ERRORS))
+
+          echo "Serenity test summary: total=$TOTAL failures=$FAILURES errors=$ERRORS allowed_max=1"
+
+          if [ "$BROKEN" -le 1 ]; then
+            echo "::notice title=Serenity test threshold passed::Detected $BROKEN failing/broken tests (<= 1 allowed)."
+            exit 0
+          fi
+
+          echo "::error title=Serenity test threshold failed::Detected $BROKEN failing/broken tests (> 1 allowed)."
+          exit 1
 
       - name: Annotate failure
         if: failure()
