@@ -643,7 +643,7 @@ jobs:
   build-docker-backend:
     name: Build Docker Backend
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.build-backend.result == 'success' && needs.build-frontend.result == 'success' && needs.secret-scan.result == 'success' && needs.sast-codeql.result == 'success' && needs.dependency-check.result == 'success' }}
+    if: ${{ always() }}
     needs:
       - build-backend
       - build-frontend
@@ -657,6 +657,19 @@ jobs:
     outputs:
       image_digest: ${{ steps.build.outputs.digest }}
     steps:
+      - name: Validate backend docker build prerequisites
+        run: |
+          if [ "${{ needs.build-backend.result }}" != "success" ] || \
+             [ "${{ needs.build-frontend.result }}" != "success" ] || \
+             [ "${{ needs.secret-scan.result }}" != "success" ] || \
+             [ "${{ needs.sast-codeql.result }}" != "success" ]; then
+            echo "::error title=Backend docker build blocked::Prerequisites not met. build-backend=${{ needs.build-backend.result }}, build-frontend=${{ needs.build-frontend.result }}, secret-scan=${{ needs.secret-scan.result }}, sast-codeql=${{ needs.sast-codeql.result }}"
+            exit 1
+          fi
+          if [ "${{ needs.dependency-check.result }}" != "success" ]; then
+            echo "::warning title=Dependency vulnerability check failed::Proceeding with backend docker build by policy."
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -686,7 +699,7 @@ jobs:
   build-docker-frontend:
     name: Build Docker Frontend
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.build-backend.result == 'success' && needs.build-frontend.result == 'success' && needs.secret-scan.result == 'success' && needs.sast-codeql.result == 'success' && needs.dependency-check.result == 'success' }}
+    if: ${{ always() }}
     needs:
       - build-backend
       - build-frontend
@@ -700,6 +713,19 @@ jobs:
     outputs:
       image_digest: ${{ steps.build.outputs.digest }}
     steps:
+      - name: Validate frontend docker build prerequisites
+        run: |
+          if [ "${{ needs.build-backend.result }}" != "success" ] || \
+             [ "${{ needs.build-frontend.result }}" != "success" ] || \
+             [ "${{ needs.secret-scan.result }}" != "success" ] || \
+             [ "${{ needs.sast-codeql.result }}" != "success" ]; then
+            echo "::error title=Frontend docker build blocked::Prerequisites not met. build-backend=${{ needs.build-backend.result }}, build-frontend=${{ needs.build-frontend.result }}, secret-scan=${{ needs.secret-scan.result }}, sast-codeql=${{ needs.sast-codeql.result }}"
+            exit 1
+          fi
+          if [ "${{ needs.dependency-check.result }}" != "success" ]; then
+            echo "::warning title=Dependency vulnerability check failed::Proceeding with frontend docker build by policy."
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -729,12 +755,23 @@ jobs:
   attest-artifacts:
     name: Attest Build Artifacts
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     needs: [build-docker-backend, build-docker-frontend, build-backend, build-frontend]
     permissions:
       id-token: write
       attestations: write
       contents: read
     steps:
+      - name: Validate attestation prerequisites
+        run: |
+          if [ "${{ needs.build-docker-backend.result }}" != "success" ] || \
+             [ "${{ needs.build-docker-frontend.result }}" != "success" ] || \
+             [ "${{ needs.build-backend.result }}" != "success" ] || \
+             [ "${{ needs.build-frontend.result }}" != "success" ]; then
+            echo "::error title=Attestation blocked::Prerequisites not met. build-docker-backend=${{ needs.build-docker-backend.result }}, build-docker-frontend=${{ needs.build-docker-frontend.result }}, build-backend=${{ needs.build-backend.result }}, build-frontend=${{ needs.build-frontend.result }}"
+            exit 1
+          fi
+
       - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
@@ -771,7 +808,7 @@ jobs:
       - secret-scan
       - sast-codeql
       - dependency-check
-    if: ${{ always() && needs.build-docker-backend.result == 'success' && needs.build-docker-frontend.result == 'success' && needs.attest-artifacts.result == 'success' && needs.secret-scan.result == 'success' && needs.sast-codeql.result == 'success' && needs.dependency-check.result == 'success' }}
+    if: ${{ always() }}
     environment: staging
     permissions:
       contents: read
@@ -779,6 +816,20 @@ jobs:
     outputs:
       deployment_status: ${{ steps.deploy.outputs.status }}
     steps:
+      - name: Validate staging deployment prerequisites
+        run: |
+          if [ "${{ needs.build-docker-backend.result }}" != "success" ] || \
+             [ "${{ needs.build-docker-frontend.result }}" != "success" ] || \
+             [ "${{ needs.attest-artifacts.result }}" != "success" ] || \
+             [ "${{ needs.secret-scan.result }}" != "success" ] || \
+             [ "${{ needs.sast-codeql.result }}" != "success" ]; then
+            echo "::error title=Staging deployment blocked::Prerequisites not met. build-docker-backend=${{ needs.build-docker-backend.result }}, build-docker-frontend=${{ needs.build-docker-frontend.result }}, attest-artifacts=${{ needs.attest-artifacts.result }}, secret-scan=${{ needs.secret-scan.result }}, sast-codeql=${{ needs.sast-codeql.result }}"
+            exit 1
+          fi
+          if [ "${{ needs.dependency-check.result }}" != "success" ]; then
+            echo "::warning title=Dependency vulnerability check failed::Proceeding with staging deployment by policy."
+          fi
+
       - name: Validate required staging secrets
         env:
           REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
@@ -815,7 +866,7 @@ jobs:
     name: Deploy Production
     runs-on: ubuntu-latest
     needs: [deploy-staging, bdd-tests-serenity, performance-tests-k6]
-    if: ${{ always() && needs.deploy-staging.result == 'success' }}
+    if: ${{ always() }}
     environment: production
     permissions:
       contents: read
@@ -823,6 +874,13 @@ jobs:
     outputs:
       deployment_status: ${{ steps.deploy.outputs.status }}
     steps:
+      - name: Validate production deployment prerequisites
+        run: |
+          if [ "${{ needs.deploy-staging.result }}" != "success" ]; then
+            echo "::error title=Production deployment blocked::Staging deployment must succeed first. deploy-staging=${{ needs.deploy-staging.result }}"
+            exit 1
+          fi
+
       - name: Validate required production secrets
         env:
           REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
