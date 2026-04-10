@@ -65,7 +65,7 @@ Follow [Canonical Folder Structure](./references/folder-structure.md) to organiz
 
 ### Step 3 – Implement Karate Tests
 
-**Applicable TCs:** TC-005–TC-007, TC-013–TC-015, TC-018, TC-023–TC-026 (10 tests)
+**Applicable TCs:** TC-005–TC-007, TC-013–TC-015, TC-018, TC-023–TC-026 (11 tests)
 
 1. Write feature files in `scripts/features/hu*_negative.feature` and `hu4_riesgo.feature`
 2. Configure with `scripts/config/karate-config.js`
