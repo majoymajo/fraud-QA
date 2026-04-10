@@ -54,7 +54,7 @@ Follow [Canonical Folder Structure](./references/folder-structure.md) to organiz
 
 ### Step 2 – Implement SerenityBDD + Cucumber
 
-**Applicable TCs:** TC-001–TC-004, TC-008–TC-012, TC-016–TC-022 (14 tests)
+**Applicable TCs:** TC-001–TC-004, TC-008–TC-012, TC-016–TC-017, TC-019–TC-022 (15 tests)
 
 1. Write Gherkin features in `scripts/features/hu*.feature`
 2. Create Java step definitions in `scripts/steps/HU*.java`
